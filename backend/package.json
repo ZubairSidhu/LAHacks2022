@@ -1,0 +1,35 @@
+{
+  "name": "lahacks-2022-backend",
+  "version": "1.0.0",
+  "private": false,
+  "main": "app.js",
+  "repository": "git@github.com:ZubairSidhu/LAHacks2022.git",
+  "author": "Zubair Sidhu",  "scripts": {
+    "start": "nodemon app.js",
+    "prepare": "husky install",
+    "lint": "eslint '**/*.js'",
+    "format": "prettier --write \"**/*.js\""
+  },
+  "lint-staged": {
+    "*.js": "yarn run eslint"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "eslint": "^8.1.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-prettier": "^4.0.0",
+    "express": "^4.17.1",
+    "husky": "^7.0.4",
+    "mongoose": "^6.0.13",
+    "nodemon": "^2.0.14",
+    "prettier": "^2.4.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "eslint-config-prettier": "^8.3.0",
+    "lint-staged": "^11.2.6"
+  }
+}
