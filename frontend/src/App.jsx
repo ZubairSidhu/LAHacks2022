@@ -5,6 +5,10 @@ import "./App.css";
 
 // Pages
 import Test from "./pages/TestPage/Test";
+import SignUp from "./pages/SignUp/SignUp";
+import NewPartners from "./pages/NewPartners/NewPartners";
+import AwaitingMatches from "./pages/AwaitingMatches/AwaitingMatches";
+import ExistingMatches from "./pages/ExistingMatches/ExistingMatches";
 
 function App() {
   return (
@@ -14,6 +18,10 @@ function App() {
           <Box className="content-wrap">
             <Routes>
               <Route path="/" element={<Test />} />
+              <Route path="/sign-up" element={<SignUp />} />
+              <Route path="/new-partners" element={<NewPartners />} />
+              <Route path="/awaiting-matches" element={<AwaitingMatches />} />
+              <Route path="/existing-matches" element={<ExistingMatches />} />
             </Routes>
           </Box>
         </Box>
