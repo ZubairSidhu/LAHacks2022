@@ -6,7 +6,7 @@
   "repository": "git@github.com:ZubairSidhu/LAHacks2022.git",
   "author": "Zubair Sidhu",  "scripts": {
     "start": "nodemon app.js",
-    "prepare": "husky install",
+    "prepare": "cd .. && husky install",
     "lint": "eslint '**/*.js'",
     "format": "prettier --write \"**/*.js\""
   },
