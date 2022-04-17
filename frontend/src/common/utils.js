@@ -27,6 +27,15 @@ function setStorageValue(key, value) {
   return null;
 }
 
+function setUserId(userId) {
+  setStorageValue("currUserId", { id: userId });
+}
+
+function getUserId() {
+  const { id: userId } = getStorageValue("currUserId", null);
+  return userId;
+}
+
 const useLocalStorage = (key, defaultValue) => {
   const [value, setValue] = useState(() => {
     return getStorageValue(key, defaultValue);
@@ -40,4 +49,11 @@ const useLocalStorage = (key, defaultValue) => {
   return [value, setValue];
 };
 
-export { setStorageValue, getStorageValue, useLocalStorage, AxiosBackend };
+export {
+  setStorageValue,
+  getStorageValue,
+  useLocalStorage,
+  setUserId,
+  getUserId,
+  AxiosBackend,
+};

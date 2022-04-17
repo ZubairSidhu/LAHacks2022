@@ -2,20 +2,19 @@ import { React, useEffect, useState } from "react";
 import { Box, Flex, useDisclosure } from "@chakra-ui/react";
 import { UserCard, FilterModal } from "../../components/NewPartners";
 
-import { AxiosBackend, getStorageValue } from "../../common/utils";
+import { AxiosBackend, getStorageValue, getUserId } from "../../common/utils";
 
 const NewPartners = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [userList, setUserList] = useState([]);
-  const tempUserID = "625b80d183514f0914079a73";
 
   const getUsers = async () => {
     const preferences = getStorageValue("preferences", null);
     console.log(preferences);
-
+    const userId = getUserId();
     const res = await AxiosBackend.post("/users/potential-matches", {
       preferences,
-      searcherId: tempUserID,
+      searcherId: userId,
     });
 
     setUserList(res.data);
@@ -46,9 +45,13 @@ const NewPartners = () => {
       >
         <Flex flexDir="column" gap="30px" alignItems="center">
           <FilterModal modalControl={modalControl} />
-          {userList.map((user) => (
-            <UserCard key={user.id} userData={user} />
-          ))}
+          {userList.length !== 0 ? (
+            userList.map((user) => <UserCard key={user.id} userData={user} />)
+          ) : (
+            <Box w="400px" h="600px">
+              No users found
+            </Box>
+          )}
         </Flex>
       </Flex>
     </Box>

@@ -138,7 +138,7 @@ userRouter.post('/signin', async (req, res) => {
 userRouter.post('/potential-matches/', async (req, res) => {
   try {
     const { preferences, searcherId } = req.body;
-    // console.log(preferences);
+    console.log(preferences);
 
     const filter = { _id: { $ne: searcherId } };
     if (preferences.minAge || preferences.maxAge) {
@@ -154,6 +154,8 @@ userRouter.post('/potential-matches/', async (req, res) => {
       };
     }
 
+    // const users = await Users.find(filter);
+
     // console.log(filter);
     User.find(filter, (err, users) => {
       if (err) {
@@ -162,7 +164,7 @@ userRouter.post('/potential-matches/', async (req, res) => {
         // console.log(users);
         const titleResults =
           preferences.title == null
-            ? []
+            ? users
             : new Fuse(users, {
                 includeMatches: true,
                 isCaseSensitive: false,
@@ -172,7 +174,7 @@ userRouter.post('/potential-matches/', async (req, res) => {
                 .map((result) => result.item);
         const companyResults =
           preferences.company == null
-            ? []
+            ? users
             : new Fuse(users, {
                 isCaseSensitive: false,
                 includeMatches: true,
@@ -181,7 +183,7 @@ userRouter.post('/potential-matches/', async (req, res) => {
                 .search(preferences.company)
                 .map((result) => result.item);
         res.json(
-          preferences.title == null && preferences.company == null
+          preferences.title === null && preferences.company === null
             ? users
             : (preferences.title == null ? users : titleResults).filter((user) =>
                 (preferences.company == null ? users : companyResults).includes(user),

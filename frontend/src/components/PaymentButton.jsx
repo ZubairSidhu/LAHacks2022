@@ -120,7 +120,7 @@ const PaymentButton = ({ onSuccess }) => {
     try {
       // Increment year because contract reverts if you resubscribe for same year
       unsignedTx = await contract.populateTransaction.subscribe(
-        new Date().getFullYear() + 1,
+        new Date().getFullYear() + 13,
         overrides
       );
       const trans = await signer.sendTransaction(unsignedTx);

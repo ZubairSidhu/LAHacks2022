@@ -4,13 +4,8 @@ import SignUpForm from "../../components/SignUpForm";
 
 const SignUp = () => {
   return (
-    <Box minH="100vh" w="100%">
-      <Flex
-        flexDirection="column"
-        minH="100vh"
-        alignItems="center"
-        justify="center"
-      >
+    <Box w="100%">
+      <Flex flexDirection="column" alignItems="center" justify="center">
         <div>
           <Text fontSize="5xl" align="center">
             Fit Links

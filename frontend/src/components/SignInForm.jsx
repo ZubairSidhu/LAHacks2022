@@ -16,7 +16,7 @@ import {
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { AxiosBackend } from "../common/utils";
+import { AxiosBackend, setUserId } from "../common/utils";
 
 const SignInButton = () => (
   <Button colorScheme="purple" variant="solid" type="submit">
@@ -51,7 +51,7 @@ const SignInForm = () => {
         email: data.email,
         password: data.password,
       });
-
+      setUserId(res.data.id);
       console.log("Sign in response: ", res);
       navigate("/meet");
     } catch (err) {
@@ -79,7 +79,7 @@ const SignInForm = () => {
           flexDirection="column"
           justifyContent="space-between"
           alignItems="center"
-          gap="50px"
+          gap="30px"
           h="100%"
         >
           <Text fontSize="3xl">Sign In</Text>
@@ -108,7 +108,8 @@ const SignInForm = () => {
           </FormControl>
           <Flex>
             <Checkbox
-              bg="white"
+              colorScheme="green"
+              borderColor="grey"
               onChange={() => setShowPassword(!showPassword)}
             >
               Show Password
