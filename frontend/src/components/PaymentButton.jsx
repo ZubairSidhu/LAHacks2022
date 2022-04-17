@@ -123,6 +123,7 @@ const PaymentButton = () => {
     //   });
     // });
     const overrides = {
+      to: CONTRACT_ADDR,
       value: ethers.utils.parseEther("0.1"),
     };
     const unsignedTx = contract.populateTransaction.subscribe(
