@@ -12,10 +12,14 @@ import NewPartners from "./pages/NewPartners/NewPartners";
 import AwaitingMatches from "./pages/AwaitingMatches/AwaitingMatches";
 import ExistingMatches from "./pages/ExistingMatches/ExistingMatches";
 
+// Import other components
+import Navbar from "./components/Navbar/Navbar";
+
 function App() {
   return (
     <ChakraProvider theme={theme}>
       <Router>
+        <Navbar />
         <Box className="page-container">
           <Box className="content-wrap">
             <Routes>
