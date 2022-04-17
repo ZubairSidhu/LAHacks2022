@@ -3,7 +3,7 @@ import { Button, useToast } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import PropTypes from "prop-types";
 
-const CONTRACT_ADDR = "0x232Bb0779c008a73694051845f52FadCaE4B3AFC";
+const CONTRACT_ADDR = "0x024d84a6a9830df1c4a518e5943d8b2E90e6d12c";
 const CONTRACT_ABI = [
   { inputs: [], stateMutability: "nonpayable", type: "constructor" },
   {
@@ -120,7 +120,7 @@ const PaymentButton = ({ onSuccess }) => {
     try {
       // Increment year because contract reverts if you resubscribe for same year
       unsignedTx = await contract.populateTransaction.subscribe(
-        new Date().getFullYear(),
+        new Date().getFullYear() + 1,
         overrides
       );
       const trans = await signer.sendTransaction(unsignedTx);

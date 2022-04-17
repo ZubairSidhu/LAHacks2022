@@ -1,5 +1,5 @@
 import { React } from "react";
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import SignInForm from "../../components/SignInForm";
 
 const SignIn = () => {
@@ -12,6 +12,9 @@ const SignIn = () => {
         justify="center"
       >
         <div>
+          <Text fontSize="5xl" align="center">
+            Fit Links
+          </Text>
           <SignInForm />
         </div>
       </Flex>

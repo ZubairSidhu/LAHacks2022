@@ -11,6 +11,7 @@ import {
   Button,
   Flex,
   Checkbox,
+  useToast,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -31,6 +32,7 @@ const schema = yup
   .required();
 
 const SignInForm = () => {
+  const toast = useToast();
   const navigate = useNavigate();
   const {
     register,
@@ -45,8 +47,6 @@ const SignInForm = () => {
 
   const onSignInSubmit = async (data) => {
     try {
-      console.log(data);
-
       const res = await AxiosBackend.post("/users/signin", {
         email: data.email,
         password: data.password,
@@ -55,12 +55,14 @@ const SignInForm = () => {
       console.log("Sign in response: ", res);
       navigate("/meet");
     } catch (err) {
-      console.log("Sign in error: ", err);
+      return toast({
+        title: "Sign in failed",
+        description: `Reason: ${err.response.data}`,
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
     }
-  };
-
-  const onSignInSubmitError = (err) => {
-    console.log(err);
   };
 
   return (
@@ -72,14 +74,12 @@ const SignInForm = () => {
       boxShadow="0px 4px 4px rgba(0, 0, 0, 0.25);"
       padding="40px 40px"
     >
-      <form
-        onSubmit={handleSubmit(onSignInSubmit, onSignInSubmitError)}
-        h="100%"
-      >
+      <form onSubmit={handleSubmit(onSignInSubmit)} h="100%">
         <Flex
           flexDirection="column"
           justifyContent="space-between"
-          gap="150px"
+          alignItems="center"
+          gap="50px"
           h="100%"
         >
           <Text fontSize="3xl">Sign In</Text>
@@ -89,6 +89,7 @@ const SignInForm = () => {
               id="email"
               placeholder="yourname@example.com"
               name="email"
+              bg="white"
               {...register("email")}
             />
             <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
@@ -100,18 +101,27 @@ const SignInForm = () => {
               type={showPassword ? "text" : "password"}
               placeholder="Enter password"
               name="password"
+              bg="white"
               {...register("password")}
             />
             <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
           </FormControl>
           <Flex>
-            <Checkbox onChange={() => setShowPassword(!showPassword)}>
+            <Checkbox
+              bg="white"
+              onChange={() => setShowPassword(!showPassword)}
+            >
               Show Password
             </Checkbox>
           </Flex>
-          <Flex justifyContent="space-around">
+          <Flex justifyContent="space-between" gap="100px">
             <SignInButton />
-            <Link href="/sign-up" fontWeight="bold" textDecoration="underline">
+            <Link
+              href="/sign-up"
+              fontWeight="bold"
+              textDecoration="underline"
+              _hover={{ textDecoration: "none" }}
+            >
               Sign Up
             </Link>
           </Flex>

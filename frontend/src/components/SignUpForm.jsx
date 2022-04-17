@@ -12,6 +12,7 @@ import {
   Flex,
   Select,
   Checkbox,
+  useToast,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -57,6 +58,7 @@ const schema = yup
   .required();
 
 const SignUpForm = () => {
+  const toast = useToast();
   const navigate = useNavigate();
   const {
     register,
@@ -90,7 +92,13 @@ const SignUpForm = () => {
       console.log(res);
       navigate("/sign-in");
     } catch (err) {
-      console.log(err);
+      return toast({
+        title: "Sign up failed",
+        description: `Reason: ${err.response.data}`,
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
     }
   };
 
@@ -127,6 +135,7 @@ const SignUpForm = () => {
                   id="firstName"
                   placeholder="John"
                   name="firstName"
+                  bg="white"
                   {...register("firstName")}
                 />
                 <FormErrorMessage>{errors.firstName?.message}</FormErrorMessage>
@@ -137,6 +146,7 @@ const SignUpForm = () => {
                   id="lastName"
                   placeholder="Smith"
                   name="lastName"
+                  bg="white"
                   {...register("lastName")}
                 />
                 <FormErrorMessage>{errors.lastName?.message}</FormErrorMessage>
@@ -149,6 +159,7 @@ const SignUpForm = () => {
                   id="zipCode"
                   placeholder="92612"
                   name="zipCode"
+                  bg="white"
                   {...register("zipCode")}
                 />
                 <FormErrorMessage>{errors.zipCode?.message}</FormErrorMessage>
@@ -159,6 +170,7 @@ const SignUpForm = () => {
                   id="email"
                   placeholder="yourname@example.com"
                   name="email"
+                  bg="white"
                   {...register("email")}
                 />
                 <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
@@ -171,6 +183,7 @@ const SignUpForm = () => {
                   id="age"
                   placeholder="18"
                   name="age"
+                  bg="white"
                   {...register("age")}
                 />
                 <FormErrorMessage>{errors.age?.message}</FormErrorMessage>
@@ -180,6 +193,7 @@ const SignUpForm = () => {
                 <Select
                   id="activityLevel"
                   placeholder="Select activity level"
+                  bg="white"
                   {...register("activityLevel")}
                 >
                   {activityLevels.map((level) => (
@@ -200,6 +214,7 @@ const SignUpForm = () => {
                   id="bio"
                   placeholder="About Me"
                   name="bio"
+                  bg="white"
                   {...register("bio")}
                 />
                 <FormErrorMessage>{errors.bio?.message}</FormErrorMessage>
@@ -213,6 +228,7 @@ const SignUpForm = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter password"
                   name="password"
+                  bg="white"
                   {...register("password")}
                 />
                 <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
@@ -226,6 +242,7 @@ const SignUpForm = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="Re-type password"
                   name="confirmPassword"
+                  bg="white"
                   {...register("confirmPassword")}
                 />
                 <FormErrorMessage>

@@ -47,7 +47,7 @@ const NewPartners = () => {
         <Flex flexDir="column" gap="30px" alignItems="center">
           <FilterModal modalControl={modalControl} />
           {userList.map((user) => (
-            <UserCard key={user.id} userData={user} swiperId={tempUserID} />
+            <UserCard key={user.id} userData={user} />
           ))}
         </Flex>
       </Flex>

@@ -2,6 +2,7 @@ const util = require('util');
 const express = require('express');
 const axios = require('axios');
 const Fuse = require('fuse.js');
+const ethers = require('ethers');
 const User = require('../models/user.model');
 
 const userRouter = express();
@@ -274,6 +275,89 @@ userRouter.delete('/:userId', async (req, res) => {
         res.json(user);
       }
     });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+const CONTRACT_ADDR = '0x024d84a6a9830df1c4a518e5943d8b2E90e6d12c';
+const CONTRACT_ABI = [
+  { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
+  {
+    inputs: [],
+    name: 'YEARLY_SUBSCRIPTION_PRICE',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'owner',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'uint256', name: '_currentYear', type: 'uint256' },
+      { internalType: 'address', name: '_receiver', type: 'address' },
+      { internalType: 'uint256', name: '_amount', type: 'uint256' },
+    ],
+    name: 'payOut',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: '_year', type: 'uint256' }],
+    name: 'subscribe',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: '', type: 'address' },
+      { internalType: 'uint256', name: '', type: 'uint256' },
+    ],
+    name: 'subscriptions',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  { stateMutability: 'payable', type: 'receive' },
+];
+
+// Payout
+userRouter.post('/payout/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // do stuff like store the exercise, check the other user match, etc.
+
+    const selfUser = await User.findById(userId);
+    const receiver = selfUser.wallet;
+    // const { friend, etc } = req.body;
+    const provider = new ethers.providers.JsonRpcProvider(
+      // 'https://rpc.ankr.com/avalanche_fuji-c',
+      'https://api.avax-test.network/ext/bc/C/rpc',
+      43113,
+    );
+    const wallet = new ethers.Wallet(process.env.ETH_KEY, provider);
+    const contract = new ethers.Contract(CONTRACT_ADDR, CONTRACT_ABI, provider);
+
+    const overrides = {
+      gasLimit: ethers.utils.hexlify(100000),
+    };
+    // MAYBE: Increment year because contract reverts if you resubscribe for same year
+    const unsignedTx = await contract.populateTransaction.payOut(
+      new Date().getFullYear(),
+      receiver,
+      ethers.utils.parseEther('0.01'),
+      overrides,
+    );
+    const trans = await wallet.sendTransaction(unsignedTx);
+    res.status(200).send(trans.hash);
   } catch (err) {
     res.status(500).send(err.message);
   }
