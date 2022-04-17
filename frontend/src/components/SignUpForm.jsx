@@ -28,6 +28,7 @@ const SignUpForm = () => {
   const handleZipCodeChange = (e) => setZipCode(e.target.value);
   const handlePasswordChange = (e) => setPassword(e.target.value);
   const handleConfirmPasswordChange = (e) => setConfirmPassword(e.target.value);
+
   const onSignUpSubmit = () => {
     console.log(firstName);
   };
@@ -51,7 +52,7 @@ const SignUpForm = () => {
           <div>
             <Text fontSize="3xl">Sign Up</Text>
             <Flex justifyContent="space-between">
-              <FormControl w="40%">
+              <FormControl isRequired w="40%">
                 <FormLabel htmlFor="firstName">First Name</FormLabel>
                 <Input
                   id="firstName"
@@ -59,7 +60,7 @@ const SignUpForm = () => {
                   onChange={handleFirstNameChange}
                 />
               </FormControl>
-              <FormControl w="40%">
+              <FormControl isRequired w="40%">
                 <FormLabel htmlFor="lastName">Last Name</FormLabel>
                 <Input
                   id="lastName"
@@ -69,7 +70,7 @@ const SignUpForm = () => {
               </FormControl>
             </Flex>
             <Flex>
-              <FormControl w="40%">
+              <FormControl isRequired w="40%">
                 <FormLabel htmlFor="zipCode">Zip Code</FormLabel>
                 <Input
                   id="zipCode"
@@ -78,7 +79,7 @@ const SignUpForm = () => {
                 />
               </FormControl>
             </Flex>
-            <Flex justifyContent="space-between">
+            <Flex isRequired justifyContent="space-between">
               <FormControl w="40%">
                 <FormLabel htmlFor="password">Password</FormLabel>
                 <Input
@@ -87,7 +88,7 @@ const SignUpForm = () => {
                   onChange={handlePasswordChange}
                 />
               </FormControl>
-              <FormControl w="40%">
+              <FormControl isRequired w="40%">
                 <FormLabel htmlFor="confirmPassword">
                   Confirm Password
                 </FormLabel>
