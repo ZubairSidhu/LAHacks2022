@@ -124,49 +124,49 @@ userRouter.post('/potential-matches/', async (req, res) => {
   try {
     const { preferences, searcherId } = req.body;
     console.log(preferences);
-    // TODO: what if preferences doesn't include field?
-    const filter = {
-      age:
-        preferences.minAge || preferences.maxAge
-          ? {
-              $gte: preferences.minAge || 0,
-              $lte: preferences.maxAge || 100,
-            }
-          : null,
-      activityLevel:
-        preferences.minActivityLevel || preferences.maxActivityLevel
-          ? {
-              $gte: preferences.minActivityLevel || 0,
-              $lte: preferences.maxActivityLevel || 5,
-            }
-          : null,
-      _id: { $ne: searcherId },
-    };
 
+    const filter = { _id: { $ne: searcherId } };
+    if (preferences.minAge || preferences.maxAge) {
+      filter.age = {
+        $gte: preferences.minAge || 0,
+        $lte: preferences.maxAge || 100,
+      };
+    }
+    if (preferences.minActivityLevel || preferences.maxActivityLevel) {
+      filter.activityLevel = {
+        $gte: preferences.minActivityLevel || 0,
+        $lte: preferences.maxActivityLevel || 5,
+      };
+    }
+
+    console.log(filter);
     User.find(filter, (err, users) => {
       if (err) {
         res.status(400).json({ error: 'Error fetching users' });
       } else {
+        console.log(users);
         const titleResults =
-          preferences.title === null
-            ? new Fuse(users, {
+          preferences.title == null
+            ? []
+            : new Fuse(users, {
+                includeMatches: true,
                 isCaseSensitive: false,
-                keys: ['title'],
-              }).search(preferences.title)
-            : [];
+                keys: ['experience.title'],
+              }).search(preferences.title);
         const companyResults =
-          preferences.company === null
-            ? new Fuse(users, {
+          preferences.company == null
+            ? []
+            : new Fuse(titleResults, {
                 isCaseSensitive: false,
-                keys: ['company'],
-              }).search(preferences.company)
-            : [];
-        console.log(titleResults);
-        console.log(companyResults);
+                includeMatches: true,
+                keys: ['item.experience.company'],
+              }).search(preferences.company);
+        // IN CASE IT BREAKS LATER: SEE WHAT HAPPENS WITH ITEM AND MULTIPLE RESULTS FROM TITLERESULTS
+        // console.log(titleResults);
+        // console.log(companyResults);
         res.json(
-          preferences.title == null && preferences.company == null
-            ? users
-            : [...new Set([...titleResults, ...companyResults])],
+          preferences.title == null && preferences.company == null ? users : companyResults,
+          // : [...new Set([...titleResults, ...companyResults])],
         );
       }
     });
