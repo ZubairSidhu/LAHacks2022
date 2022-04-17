@@ -3,12 +3,18 @@ import {
   Box,
   FormControl,
   FormLabel,
+  FormErrorMessage,
   Input,
   Text,
   Button,
   Flex,
+  Select,
+  Checkbox,
 } from "@chakra-ui/react";
-import PropTypes from "prop-types";
+import { ethers } from "ethers";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 
 const SubscriptionButton = () => (
   <Button colorScheme="teal" variant="solid" type="submit">
@@ -16,21 +22,41 @@ const SubscriptionButton = () => (
   </Button>
 );
 
+const schema = yup
+  .object({
+    firstName: yup.string().required("Missing first name!"),
+    lastName: yup.string().required("Missing last name!"),
+    zipCode: yup.string().required("Missing zip code!"),
+    email: yup.string().required("Missing email!"),
+    age: yup
+      .number()
+      .min(1, "Invalid age, please enter a valid age")
+      .required(),
+    bio: yup.string(),
+    password: yup.string(),
+    confirmPassword: yup.string(),
+  })
+  .required();
+
 const SignUpForm = () => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [zipCode, setZipCode] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    delayError: 750,
+  });
 
-  const handleFirstNameChange = (e) => setFirstName(e.target.value);
-  const handleLastNameChange = (e) => setLastName(e.target.value);
-  const handleZipCodeChange = (e) => setZipCode(e.target.value);
-  const handlePasswordChange = (e) => setPassword(e.target.value);
-  const handleConfirmPasswordChange = (e) => setConfirmPassword(e.target.value);
+  const [showPassword, setShowPassword] = useState(false);
+  const [activityLevel, setActivityLevel] = useState(1);
 
-  const onSignUpSubmit = () => {
-    console.log(firstName);
+  const handleActivityLevelChange = (e) => setActivityLevel(e.target.value);
+
+  const activityLevels = [1, 2, 3, 4, 5];
+
+  const onSignUpSubmit = async (data) => {
+    console.log(data);
   };
 
   return (
@@ -42,62 +68,130 @@ const SignUpForm = () => {
       boxShadow="0px 4px 4px rgba(0, 0, 0, 0.25);"
       padding="40px 40px"
     >
-      <form onSubmit={onSignUpSubmit} h="100%">
+      <form onSubmit={handleSubmit(onSignUpSubmit)} h="100%">
         <Flex
           flexDirection="column"
           justifyContent="space-between"
           gap="150px"
           h="100%"
         >
+          <p>{showPassword ? "show" : "don't show"}</p>
+          {JSON.stringify(errors, null, 2)}
           <div>
             <Text fontSize="3xl">Sign Up</Text>
             <Flex justifyContent="space-between">
-              <FormControl isRequired w="40%">
+              <FormControl w="40%" isInvalid={false}>
                 <FormLabel htmlFor="firstName">First Name</FormLabel>
                 <Input
                   id="firstName"
                   placeholder="John"
-                  onChange={handleFirstNameChange}
+                  name="firstName"
+                  {...register("firstName")}
                 />
+                <FormErrorMessage>Invalid first name!</FormErrorMessage>
               </FormControl>
-              <FormControl isRequired w="40%">
+              <FormControl w="40%" isInvalid={false}>
                 <FormLabel htmlFor="lastName">Last Name</FormLabel>
                 <Input
                   id="lastName"
-                  placeholder="Adams"
-                  onChange={handleLastNameChange}
+                  placeholder="Smith"
+                  name="lastName"
+                  {...register("lastName")}
                 />
+                <FormErrorMessage>Invalid last name!</FormErrorMessage>
               </FormControl>
             </Flex>
-            <Flex>
-              <FormControl isRequired w="40%">
+            <Flex justifyContent="space-between">
+              <FormControl w="40%" isInvalid={false}>
                 <FormLabel htmlFor="zipCode">Zip Code</FormLabel>
                 <Input
                   id="zipCode"
                   placeholder="92612"
-                  onChange={handleZipCodeChange}
+                  name="zipCode"
+                  {...register("zipCode")}
                 />
+                <FormErrorMessage>Invalid zip code!</FormErrorMessage>
+              </FormControl>
+              <FormControl w="40%" isInvalid={false}>
+                <FormLabel htmlFor="email">Email</FormLabel>
+                <Input
+                  id="email"
+                  placeholder="yourname@example.com"
+                  name="email"
+                  {...register("email")}
+                />
+                <FormErrorMessage>Invalid email!</FormErrorMessage>
               </FormControl>
             </Flex>
-            <Flex isRequired justifyContent="space-between">
+            <Flex justifyContent="space-between">
+              <FormControl w="40%" isInvalid={false}>
+                <FormLabel htmlFor="age">Age</FormLabel>
+                <Input
+                  id="age"
+                  placeholder="18"
+                  name="age"
+                  {...register("age")}
+                />
+                <FormErrorMessage>Invalid age!</FormErrorMessage>
+              </FormControl>
               <FormControl w="40%">
+                <FormLabel htmlFor="activityLevel">Activity Level</FormLabel>
+                {/* <Input
+                  id="activityLevel"
+                  placeholder="1"
+                  onChange={handleActivityLevelChange}
+                /> */}
+                <Select id="activityLevel" placeholder="Select activity level">
+                  {activityLevels.map((level) => (
+                    <option key={level} value={level}>
+                      {level}
+                    </option>
+                  ))}
+                </Select>
+              </FormControl>
+            </Flex>
+            <Flex>
+              <FormControl w="40%" isInvalid={false}>
+                <FormLabel htmlFor="bio">Bio</FormLabel>
+                <Input
+                  id="bio"
+                  placeholder="About Me"
+                  name="bio"
+                  {...register("bio")}
+                />
+                <FormErrorMessage>Invalid bio!</FormErrorMessage>
+              </FormControl>
+            </Flex>
+            <Flex justifyContent="space-between">
+              <FormControl w="40%" isInvalid={false}>
                 <FormLabel htmlFor="password">Password</FormLabel>
                 <Input
                   id="password"
-                  placeholder="John"
-                  onChange={handlePasswordChange}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter password"
+                  name="password"
+                  {...register("password")}
                 />
+                <FormErrorMessage>Invalid password!</FormErrorMessage>
               </FormControl>
-              <FormControl isRequired w="40%">
+              <FormControl w="40%" isInvalid={false}>
                 <FormLabel htmlFor="confirmPassword">
                   Confirm Password
                 </FormLabel>
                 <Input
                   id="confirmPassword"
-                  placeholder="John"
-                  onChange={handleConfirmPasswordChange}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Re-type password"
+                  name="confirmPassword"
+                  {...register("confirmPassword")}
                 />
+                <FormErrorMessage>Invalid confirm password!</FormErrorMessage>
               </FormControl>
+            </Flex>
+            <Flex>
+              <Checkbox onClick={() => setShowPassword(true)}>
+                Show Password
+              </Checkbox>
             </Flex>
           </div>
         </Flex>

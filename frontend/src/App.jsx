@@ -11,6 +11,7 @@ import SignUp from "./pages/SignUp/SignUp";
 import NewPartners from "./pages/NewPartners/NewPartners";
 import AwaitingMatches from "./pages/AwaitingMatches/AwaitingMatches";
 import ExistingMatches from "./pages/ExistingMatches/ExistingMatches";
+import PaymentButton from "./components/PaymentButton";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
               <Route path="/new-partners" element={<NewPartners />} />
               <Route path="/awaiting-matches" element={<AwaitingMatches />} />
               <Route path="/existing-matches" element={<ExistingMatches />} />
+              <Route path="/testing" element={<PaymentButton />} />
             </Routes>
           </Box>
         </Box>

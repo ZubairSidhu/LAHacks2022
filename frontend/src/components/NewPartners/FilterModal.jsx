@@ -1,12 +1,17 @@
-import { React } from "react";
+import { React, useState } from "react";
 import PropTypes from "prop-types";
-
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import {
   Button,
   Box,
   Text,
   Image,
+  Input,
   Flex,
+  FormControl,
+  FormLabel,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -17,6 +22,7 @@ import {
   RangeSliderTrack,
   RangeSliderFilledTrack,
   RangeSliderThumb,
+  RangeSliderMark,
 } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 
@@ -32,33 +38,74 @@ const FilterButton = ({ onOpen }) => (
   </Button>
 );
 
-const Content = () => {
-  return (
-    <Flex flexDirection="column" justifyContent="flex-start">
-      <Text fontSize="3xl">Partner Filters</Text>
-      <RangeSlider
-        // eslint-disable-next-line jsx-a11y/aria-proptypes
-        aria-label={["min", "max"]}
-        colorScheme="purple"
-        defaultValue={[10, 30]}
-      >
-        <RangeSliderTrack>
-          <RangeSliderFilledTrack />
-        </RangeSliderTrack>
-        <RangeSliderThumb index={0} />
-        <RangeSliderThumb index={1} />
-      </RangeSlider>
-    </Flex>
-  );
-};
+const FormRangeSlider = ({ name, title, control, min, max }) => (
+  <FormControl>
+    <FormLabel htmlFor={name}>{title}</FormLabel>
+    <Controller
+      control={control}
+      name={name}
+      // eslint-disable-next-line no-unused-vars
+      render={({ field: { onChange, value, ref } }) => (
+        <RangeSlider min={min} max={max} step={1} onChange={onChange}>
+          <Flex flexDirection="row">
+            <RangeSliderMark value={min} mt="16px" fontSize="sm">
+              {min}
+            </RangeSliderMark>
+            <RangeSliderMark value={max} mt="16px" ml="-15px" fontSize="sm">
+              {max}
+            </RangeSliderMark>
+          </Flex>
+          <RangeSliderTrack>
+            <RangeSliderFilledTrack bg="purple.600" />
+          </RangeSliderTrack>
+          <RangeSliderThumb boxSize={6} index={0}>
+            {value[0]}
+          </RangeSliderThumb>
+          <RangeSliderThumb boxSize={6} index={1}>
+            {value[1]}
+          </RangeSliderThumb>
+        </RangeSlider>
+      )}
+    />
+  </FormControl>
+);
+
+const schema = yup
+  .object({
+    ageRange: yup.array(),
+    activityRange: yup.array(),
+    title: yup.string(),
+    company: yup.string(),
+    school: yup.string(),
+  })
+  .required();
 
 const FilterModal = ({ modalControl }) => {
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    delayError: 750,
+    defaultValues: {
+      ageRange: [18, 65],
+      activityRange: [2, 3],
+    },
+  });
+
   const { isOpen, onOpen, onClose } = modalControl;
+
+  const onSubmit = async (data) => {
+    alert(JSON.stringify(data, null, 2));
+  };
+
   return (
     <>
       <FilterButton onOpen={onOpen} />
       <Modal
-        isOpen={isOpen}
+        isOpen={isOpen || true}
         onClose={onClose}
         size="xl"
         isCentered
@@ -66,17 +113,70 @@ const FilterModal = ({ modalControl }) => {
         borderRadius="lg"
       >
         <ModalOverlay />
-        <ModalContent bgColor="gray.50" padding="40px 40px">
+        <ModalContent bgColor="gray.50" padding="40px 40px" maxW="900px">
           <ModalCloseButton />
           <ModalBody>
-            <Content />
-          </ModalBody>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Flex
+                flexDirection="column"
+                justifyContent="flex-start"
+                gap="50px"
+              >
+                <Text fontSize="3xl">Partner Filters</Text>
+                <FormRangeSlider
+                  name="ageRange"
+                  title="Age Range"
+                  control={control}
+                  min={18}
+                  max={99}
+                />
+                <FormRangeSlider
+                  name="activityRange"
+                  title="Activity Range"
+                  control={control}
+                  min={1}
+                  max={5}
+                />
+                <Flex flexDirection="column" gap="40px">
+                  <Flex gap="40px">
+                    <FormControl>
+                      <FormLabel htmlFor="title">Title</FormLabel>
+                      <Input
+                        id="title"
+                        placeholder="e.g. Software Engineer"
+                        name="title"
+                        {...register("title")}
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel htmlFor="company">Company</FormLabel>
+                      <Input
+                        id="company"
+                        placeholder="e.g. Software Engineer"
+                        name="company"
+                        {...register("company")}
+                      />
+                    </FormControl>
+                  </Flex>
+                  <Box w="50%" pr="20px">
+                    <FormControl>
+                      <FormLabel htmlFor="school">School</FormLabel>
+                      <Input
+                        id="school"
+                        placeholder="e.g. UCLA"
+                        name="school"
+                        {...register("school")}
+                      />
+                    </FormControl>
+                  </Box>
+                </Flex>
 
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Close
-            </Button>
-          </ModalFooter>
+                <Button type="submit" size="md" colorScheme="teal" maxW="140px">
+                  Find partners!
+                </Button>
+              </Flex>
+            </form>
+          </ModalBody>
         </ModalContent>
       </Modal>
     </>
@@ -85,6 +185,14 @@ const FilterModal = ({ modalControl }) => {
 
 FilterButton.propTypes = {
   onOpen: PropTypes.func.isRequired,
+};
+
+FormRangeSlider.propTypes = {
+  name: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  control: PropTypes.func.isRequired,
+  min: PropTypes.number.isRequired,
+  max: PropTypes.number.isRequired,
 };
 
 FilterModal.propTypes = {

@@ -29,9 +29,17 @@ const NewPartners = () => {
   };
   return (
     <Box w="100%" h="100%">
-      New Partners Page
-      <FilterModal modalControl={modalControl} />
-      <UserCard userData={dummyUser} />
+      <Flex
+        flexDirection="column"
+        minH="100vh"
+        alignItems="center"
+        justify="center"
+      >
+        <Box>
+          <FilterModal modalControl={modalControl} />
+          <UserCard userData={dummyUser} />
+        </Box>
+      </Flex>
     </Box>
   );
 };
