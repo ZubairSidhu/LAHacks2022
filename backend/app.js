@@ -4,7 +4,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 
 // Routers
-const userRouter = require('./routes/user');
+const usersRouter = require('./routes/users');
 
 require('dotenv').config();
 
@@ -32,7 +32,7 @@ app.use(
   }),
 );
 
-app.use('/user', userRouter);
+app.use('/users', usersRouter);
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
