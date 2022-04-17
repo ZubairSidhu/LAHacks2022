@@ -26,9 +26,9 @@ function App() {
             <Routes>
               <Route path="/" element={<Test />} />
               <Route path="/sign-up" element={<SignUp />} />
-              <Route path="/new-partners" element={<NewPartners />} />
-              <Route path="/awaiting-matches" element={<AwaitingMatches />} />
-              <Route path="/existing-matches" element={<ExistingMatches />} />
+              <Route path="/meet" element={<NewPartners />} />
+              <Route path="/notifications" element={<AwaitingMatches />} />
+              <Route path="/matches" element={<ExistingMatches />} />
               <Route path="/testing" element={<PaymentButton />} />
             </Routes>
           </Box>

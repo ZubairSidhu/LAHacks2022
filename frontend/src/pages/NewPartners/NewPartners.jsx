@@ -12,6 +12,7 @@ const NewPartners = () => {
   // Fetch data using preferences from localstorage
   useEffect(async () => {
     const preferences = getStorageValue("preferences", null);
+    console.log(preferences);
 
     if (preferences) {
       const usersList = await AxiosBackend.post("/users/potential-matches", {

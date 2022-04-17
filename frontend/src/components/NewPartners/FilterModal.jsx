@@ -149,7 +149,7 @@ const FilterModal = ({ modalControl }) => {
                       <FormLabel htmlFor="company">Company</FormLabel>
                       <Input
                         id="company"
-                        placeholder="e.g. Software Engineer"
+                        placeholder="e.g. Google"
                         name="company"
                         {...register("company")}
                       />

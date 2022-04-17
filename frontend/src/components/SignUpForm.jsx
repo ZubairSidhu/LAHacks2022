@@ -33,6 +33,7 @@ const schema = yup
       .min(1, "Invalid age: please enter a valid age (>0)")
       .typeError("Age must be a number!")
       .required("Missing age!"),
+    activityLevel: yup.string().required("Missing activity level!"),
     bio: yup.string(),
     password: yup
       .string()
@@ -56,9 +57,6 @@ const SignUpForm = () => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const [activityLevel, setActivityLevel] = useState(1);
-
-  const handleActivityLevelChange = (e) => setActivityLevel(e.target.value);
 
   const activityLevels = [1, 2, 3, 4, 5];
 
@@ -147,20 +145,22 @@ const SignUpForm = () => {
                 />
                 <FormErrorMessage>{errors.age?.message}</FormErrorMessage>
               </FormControl>
-              <FormControl w="40%">
+              <FormControl w="40%" isInvalid={errors?.activityLevel}>
                 <FormLabel htmlFor="activityLevel">Activity Level</FormLabel>
-                {/* <Input
+                <Select
                   id="activityLevel"
-                  placeholder="1"
-                  onChange={handleActivityLevelChange}
-                /> */}
-                <Select id="activityLevel" placeholder="Select activity level">
+                  placeholder="Select activity level"
+                  {...register("activityLevel")}
+                >
                   {activityLevels.map((level) => (
                     <option key={level} value={level}>
                       {level}
                     </option>
                   ))}
                 </Select>
+                <FormErrorMessage>
+                  {errors.activityLevel?.message}
+                </FormErrorMessage>
               </FormControl>
             </Flex>
             <Flex>
