@@ -123,7 +123,7 @@ userRouter.post('/signin', async (req, res) => {
 userRouter.post('/potential-matches/', async (req, res) => {
   try {
     const { preferences, searcherId } = req.body;
-    console.log(preferences);
+    // console.log(preferences);
 
     const filter = { _id: { $ne: searcherId } };
     if (preferences.minAge || preferences.maxAge) {
@@ -139,12 +139,12 @@ userRouter.post('/potential-matches/', async (req, res) => {
       };
     }
 
-    console.log(filter);
+    // console.log(filter);
     User.find(filter, (err, users) => {
       if (err) {
         res.status(400).json({ error: 'Error fetching users' });
       } else {
-        console.log(users);
+        // console.log(users);
         const titleResults =
           preferences.title == null
             ? []
@@ -152,21 +152,25 @@ userRouter.post('/potential-matches/', async (req, res) => {
                 includeMatches: true,
                 isCaseSensitive: false,
                 keys: ['experience.title'],
-              }).search(preferences.title);
+              })
+                .search(preferences.title)
+                .map((result) => result.item);
         const companyResults =
           preferences.company == null
             ? []
-            : new Fuse(titleResults, {
+            : new Fuse(users, {
                 isCaseSensitive: false,
                 includeMatches: true,
-                keys: ['item.experience.company'],
-              }).search(preferences.company);
-        // IN CASE IT BREAKS LATER: SEE WHAT HAPPENS WITH ITEM AND MULTIPLE RESULTS FROM TITLERESULTS
-        // console.log(titleResults);
-        // console.log(companyResults);
+                keys: ['experience.company'],
+              })
+                .search(preferences.company)
+                .map((result) => result.item);
         res.json(
-          preferences.title == null && preferences.company == null ? users : companyResults,
-          // : [...new Set([...titleResults, ...companyResults])],
+          preferences.title == null && preferences.company == null
+            ? users
+            : (preferences.title == null ? users : titleResults).filter((user) =>
+                (preferences.company == null ? users : companyResults).includes(user),
+              ),
         );
       }
     });
