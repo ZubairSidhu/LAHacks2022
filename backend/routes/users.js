@@ -1,6 +1,7 @@
 const util = require('util');
 const express = require('express');
 const axios = require('axios');
+const Fuse = require('fuse.js');
 const User = require('../models/user.model');
 
 const userRouter = express();
@@ -121,7 +122,7 @@ userRouter.post('/signin', async (req, res) => {
 
 userRouter.post('/potential-matches/', async (req, res) => {
   try {
-    const { preferences } = req.body;
+    const { preferences, searcherId } = req.body;
     console.log(preferences);
     // TODO: what if preferences doesn't include field?
     const filter = {
@@ -139,13 +140,34 @@ userRouter.post('/potential-matches/', async (req, res) => {
               $lte: preferences.maxActivityLevel || 5,
             }
           : null,
+      _id: { $ne: searcherId },
     };
 
     User.find(filter, (err, users) => {
       if (err) {
         res.status(400).json({ error: 'Error fetching users' });
       } else {
-        res.json(users);
+        const titleResults =
+          preferences.title === null
+            ? new Fuse(users, {
+                isCaseSensitive: false,
+                keys: ['title'],
+              }).search(preferences.title)
+            : [];
+        const companyResults =
+          preferences.company === null
+            ? new Fuse(users, {
+                isCaseSensitive: false,
+                keys: ['company'],
+              }).search(preferences.company)
+            : [];
+        console.log(titleResults);
+        console.log(companyResults);
+        res.json(
+          preferences.title == null && preferences.company == null
+            ? users
+            : [...new Set([...titleResults, ...companyResults])],
+        );
       }
     });
   } catch (err) {
