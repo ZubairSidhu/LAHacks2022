@@ -125,8 +125,20 @@ userRouter.post('/potential-matches/', async (req, res) => {
     console.log(preferences);
     // TODO: what if preferences doesn't include field?
     const filter = {
-      age: { $gte: 19, $lte: 23 },
-      activityLevel: { $gte: 2, $lte: 5 },
+      age:
+        preferences.minAge || preferences.maxAge
+          ? {
+              $gte: preferences.minAge || 0,
+              $lte: preferences.maxAge || 100,
+            }
+          : null,
+      activityLevel:
+        preferences.minActivityLevel || preferences.maxActivityLevel
+          ? {
+              $gte: preferences.minActivityLevel || 0,
+              $lte: preferences.maxActivityLevel || 5,
+            }
+          : null,
     };
 
     User.find(filter, (err, users) => {
