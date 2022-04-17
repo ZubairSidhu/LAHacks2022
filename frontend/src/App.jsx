@@ -3,6 +3,8 @@ import { ChakraProvider, Box } from "@chakra-ui/react";
 import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
 import "./App.css";
 
+import theme from "./theme";
+
 // Pages
 import Test from "./pages/TestPage/Test";
 import SignUp from "./pages/SignUp/SignUp";
@@ -12,7 +14,7 @@ import ExistingMatches from "./pages/ExistingMatches/ExistingMatches";
 
 function App() {
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       <Router>
         <Box className="page-container">
           <Box className="content-wrap">
