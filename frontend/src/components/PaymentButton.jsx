@@ -2,6 +2,54 @@ import React from "react";
 import { Button, useToast } from "@chakra-ui/react";
 import { ethers } from "ethers";
 
+const CONTRACT_ADDR = "0x232Bb0779c008a73694051845f52FadCaE4B3AFC";
+const CONTRACT_ABI = [
+  { inputs: [], stateMutability: "nonpayable", type: "constructor" },
+  {
+    inputs: [],
+    name: "YEARLY_SUBSCRIPTION_PRICE",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "owner",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "_currentYear", type: "uint256" },
+      { internalType: "address", name: "_receiver", type: "address" },
+      { internalType: "uint256", name: "_amount", type: "uint256" },
+    ],
+    name: "payOut",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "_year", type: "uint256" }],
+    name: "subscribe",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "", type: "address" },
+      { internalType: "uint256", name: "", type: "uint256" },
+    ],
+    name: "subscriptions",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  { stateMutability: "payable", type: "receive" },
+];
+
 const PaymentButton = () => {
   const toast = useToast();
 
@@ -46,14 +94,42 @@ const PaymentButton = () => {
     const signer = provider.getSigner();
     console.log("Account:", await signer.getAddress());
 
-    const tx = {
-      to: "0x0000D44D16c1185C22d7Bc402600085d9b2efdD2",
+    const contract = new ethers.Contract(CONTRACT_ADDR, CONTRACT_ABI, provider);
+    console.log(contract);
+
+    // const tx = {
+    //   to: "0x0000D44D16c1185C22d7Bc402600085d9b2efdD2",
+    //   value: ethers.utils.parseEther("0.1"),
+    //   //   nonce: window.ethersProvider.getTransactionCount(send_account, "latest"),
+    //   //   gasLimit: ethers.utils.hexlify(gas_limit), // 100000
+    //   //   gasPrice: gas_price,
+    // };
+    // signer.sendTransaction(tx).then(async (trans) => {
+    //   console.log(trans);
+    //   toast({
+    //     title: "Transaction sent.",
+    //     // description: "We've created your account for you.",
+    //     status: "info",
+    //     duration: 2000,
+    //     isClosable: true,
+    //   });
+    //   await trans.wait(1);
+    //   toast({
+    //     title: "Transaction succeeded!",
+    //     // description: "We've created your account for you.",
+    //     status: "success",
+    //     duration: 2000,
+    //     isClosable: true,
+    //   });
+    // });
+    const overrides = {
       value: ethers.utils.parseEther("0.1"),
-      //   nonce: window.ethersProvider.getTransactionCount(send_account, "latest"),
-      //   gasLimit: ethers.utils.hexlify(gas_limit), // 100000
-      //   gasPrice: gas_price,
     };
-    signer.sendTransaction(tx).then(async (trans) => {
+    const unsignedTx = contract.populateTransaction.subscribe(
+      new Date().getFullYear(),
+      overrides
+    );
+    signer.sendTransaction(unsignedTx).then(async (trans) => {
       console.log(trans);
       toast({
         title: "Transaction sent.",

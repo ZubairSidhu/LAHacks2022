@@ -26,11 +26,14 @@ import {
 } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 
+import { setStorageValue } from "../../common/utils";
+
 const FilterButton = ({ onOpen }) => (
   <Button
     rightIcon={<SearchIcon />}
     bgColor="purple.100"
     boxShadow="0px 4px 4px rgba(0, 0, 0, 0.25);"
+    maxW="200px"
     variant="solidNoHover"
     onClick={onOpen}
   >
@@ -81,12 +84,7 @@ const schema = yup
   .required();
 
 const FilterModal = ({ modalControl }) => {
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
+  const { register, control, handleSubmit } = useForm({
     resolver: yupResolver(schema),
     delayError: 750,
     defaultValues: {
@@ -99,13 +97,14 @@ const FilterModal = ({ modalControl }) => {
 
   const onSubmit = async (data) => {
     alert(JSON.stringify(data, null, 2));
+    setStorageValue("preferences", data);
   };
 
   return (
     <>
       <FilterButton onOpen={onOpen} />
       <Modal
-        isOpen={isOpen || true}
+        isOpen={isOpen}
         onClose={onClose}
         size="xl"
         isCentered

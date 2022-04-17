@@ -1,16 +1,28 @@
-import { React } from "react";
-import {
-  Box,
-  Text,
-  Image,
-  Flex,
-  IconButton,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { React, useEffect } from "react";
+import { Box, Flex, useDisclosure } from "@chakra-ui/react";
 import { UserCard, FilterModal } from "../../components/NewPartners";
+
+import { AxiosBackend, getStorageValue } from "../../common/utils";
 
 const NewPartners = () => {
   const modalControl = useDisclosure();
+
+  const tempUserID = "625b80d183514f0914079a73";
+
+  // Fetch data using preferences from localstorage
+  useEffect(async () => {
+    const preferences = getStorageValue("preferences", null);
+
+    if (preferences) {
+      const usersList = await AxiosBackend.post("/users/potential-matches", {
+        preferences: null,
+        searcherId: tempUserID,
+      });
+
+      console.log(usersList);
+    }
+  }, []);
+
   const dummyUser = {
     firstName: "Dan",
     lastName: "Abramov",
@@ -35,10 +47,10 @@ const NewPartners = () => {
         alignItems="center"
         justify="center"
       >
-        <Box>
+        <Flex flexDir="column" gap="30px" alignItems="center">
           <FilterModal modalControl={modalControl} />
           <UserCard userData={dummyUser} />
-        </Box>
+        </Flex>
       </Flex>
     </Box>
   );

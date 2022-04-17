@@ -27,14 +27,21 @@ const schema = yup
     firstName: yup.string().required("Missing first name!"),
     lastName: yup.string().required("Missing last name!"),
     zipCode: yup.string().required("Missing zip code!"),
-    email: yup.string().required("Missing email!"),
+    email: yup.string().email().required("Missing email!"),
     age: yup
       .number()
-      .min(1, "Invalid age, please enter a valid age")
-      .required(),
+      .min(1, "Invalid age: please enter a valid age (>0)")
+      .typeError("Age must be a number!")
+      .required("Missing age!"),
     bio: yup.string(),
-    password: yup.string(),
-    confirmPassword: yup.string(),
+    password: yup
+      .string()
+      .required("Missing password!")
+      .min(8, "Password is too short - should be 8 chars minimum!"),
+    confirmPassword: yup
+      .string()
+      .required("Need to confirm password!")
+      .oneOf([yup.ref("password"), null], "Passwords don't match!"),
   })
   .required();
 
@@ -59,6 +66,10 @@ const SignUpForm = () => {
     console.log(data);
   };
 
+  const onSignUpSubmitError = async (err) => {
+    console.log(err);
+  };
+
   return (
     <Box
       w="900px"
@@ -68,19 +79,21 @@ const SignUpForm = () => {
       boxShadow="0px 4px 4px rgba(0, 0, 0, 0.25);"
       padding="40px 40px"
     >
-      <form onSubmit={handleSubmit(onSignUpSubmit)} h="100%">
+      <form
+        onSubmit={handleSubmit(onSignUpSubmit, onSignUpSubmitError)}
+        h="100%"
+      >
         <Flex
           flexDirection="column"
           justifyContent="space-between"
           gap="150px"
           h="100%"
         >
-          <p>{showPassword ? "show" : "don't show"}</p>
-          {JSON.stringify(errors, null, 2)}
+          {/* {JSON.stringify(errors, null, 2)} */}
           <div>
             <Text fontSize="3xl">Sign Up</Text>
             <Flex justifyContent="space-between">
-              <FormControl w="40%" isInvalid={false}>
+              <FormControl w="40%" isInvalid={errors?.firstName}>
                 <FormLabel htmlFor="firstName">First Name</FormLabel>
                 <Input
                   id="firstName"
@@ -88,9 +101,9 @@ const SignUpForm = () => {
                   name="firstName"
                   {...register("firstName")}
                 />
-                <FormErrorMessage>Invalid first name!</FormErrorMessage>
+                <FormErrorMessage>{errors.firstName?.message}</FormErrorMessage>
               </FormControl>
-              <FormControl w="40%" isInvalid={false}>
+              <FormControl w="40%" isInvalid={errors?.lastName}>
                 <FormLabel htmlFor="lastName">Last Name</FormLabel>
                 <Input
                   id="lastName"
@@ -98,11 +111,11 @@ const SignUpForm = () => {
                   name="lastName"
                   {...register("lastName")}
                 />
-                <FormErrorMessage>Invalid last name!</FormErrorMessage>
+                <FormErrorMessage>{errors.lastName?.message}</FormErrorMessage>
               </FormControl>
             </Flex>
             <Flex justifyContent="space-between">
-              <FormControl w="40%" isInvalid={false}>
+              <FormControl w="40%" isInvalid={errors?.zipCode}>
                 <FormLabel htmlFor="zipCode">Zip Code</FormLabel>
                 <Input
                   id="zipCode"
@@ -110,9 +123,9 @@ const SignUpForm = () => {
                   name="zipCode"
                   {...register("zipCode")}
                 />
-                <FormErrorMessage>Invalid zip code!</FormErrorMessage>
+                <FormErrorMessage>{errors.zipCode?.message}</FormErrorMessage>
               </FormControl>
-              <FormControl w="40%" isInvalid={false}>
+              <FormControl w="40%" isInvalid={errors?.email}>
                 <FormLabel htmlFor="email">Email</FormLabel>
                 <Input
                   id="email"
@@ -120,11 +133,11 @@ const SignUpForm = () => {
                   name="email"
                   {...register("email")}
                 />
-                <FormErrorMessage>Invalid email!</FormErrorMessage>
+                <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
               </FormControl>
             </Flex>
             <Flex justifyContent="space-between">
-              <FormControl w="40%" isInvalid={false}>
+              <FormControl w="40%" isInvalid={errors?.age}>
                 <FormLabel htmlFor="age">Age</FormLabel>
                 <Input
                   id="age"
@@ -132,7 +145,7 @@ const SignUpForm = () => {
                   name="age"
                   {...register("age")}
                 />
-                <FormErrorMessage>Invalid age!</FormErrorMessage>
+                <FormErrorMessage>{errors.age?.message}</FormErrorMessage>
               </FormControl>
               <FormControl w="40%">
                 <FormLabel htmlFor="activityLevel">Activity Level</FormLabel>
@@ -151,7 +164,7 @@ const SignUpForm = () => {
               </FormControl>
             </Flex>
             <Flex>
-              <FormControl w="40%" isInvalid={false}>
+              <FormControl w="40%" isInvalid={errors?.bio}>
                 <FormLabel htmlFor="bio">Bio</FormLabel>
                 <Input
                   id="bio"
@@ -159,11 +172,11 @@ const SignUpForm = () => {
                   name="bio"
                   {...register("bio")}
                 />
-                <FormErrorMessage>Invalid bio!</FormErrorMessage>
+                <FormErrorMessage>{errors.bio?.message}</FormErrorMessage>
               </FormControl>
             </Flex>
             <Flex justifyContent="space-between">
-              <FormControl w="40%" isInvalid={false}>
+              <FormControl w="40%" isInvalid={errors?.password}>
                 <FormLabel htmlFor="password">Password</FormLabel>
                 <Input
                   id="password"
@@ -172,9 +185,9 @@ const SignUpForm = () => {
                   name="password"
                   {...register("password")}
                 />
-                <FormErrorMessage>Invalid password!</FormErrorMessage>
+                <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
               </FormControl>
-              <FormControl w="40%" isInvalid={false}>
+              <FormControl w="40%" isInvalid={errors?.confirmPassword}>
                 <FormLabel htmlFor="confirmPassword">
                   Confirm Password
                 </FormLabel>
@@ -185,11 +198,13 @@ const SignUpForm = () => {
                   name="confirmPassword"
                   {...register("confirmPassword")}
                 />
-                <FormErrorMessage>Invalid confirm password!</FormErrorMessage>
+                <FormErrorMessage>
+                  {errors.confirmPassword?.message}
+                </FormErrorMessage>
               </FormControl>
             </Flex>
             <Flex>
-              <Checkbox onClick={() => setShowPassword(true)}>
+              <Checkbox onChange={() => setShowPassword(!showPassword)}>
                 Show Password
               </Checkbox>
             </Flex>
