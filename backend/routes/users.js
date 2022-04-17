@@ -1,4 +1,6 @@
+const util = require('util');
 const express = require('express');
+const axios = require('axios');
 const User = require('../models/user.model');
 
 const userRouter = express();
@@ -36,39 +38,64 @@ userRouter.get('/:email', async (req, res) => {
 });
 
 // User sign up
-// TODO: Make sure there's no duplicate emails
 userRouter.post('/signup', async (req, res) => {
   try {
-    const { firstName, lastName, zip, email, password, wallet } = req.body;
+    const { firstName, lastName, zip, email, password, age, bio, activityLevel } = req.body;
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      res.status(400).json('Email Already Exists');
+      return;
+    }
 
-    User.findOne({ email }, (err, user) => {
-      if (err) {
-        res.status(400).json({ error: 'Error fetching users' });
-      } else if (user) {
-        res.status(400).json('Email Already Exists');
-      } else {
-        const obj = {
-          firstName,
-          lastName,
-          zip,
-          email,
-          password,
-          wallet,
-          preferences: [],
-          oneWayMatch: [],
-          twoWayMatch: [],
-          trackedWorkouts: [],
-        };
+    const searchParams = {
+      api_key: process.env.PDL_KEY,
+      first_name: firstName,
+      last_name: lastName,
+      email,
+      postal_code: zip,
+    };
 
-        User.create(obj, (e, u) => {
-          if (e) {
-            res.status(400).json({ e: 'Error creating user' });
-          } else {
-            res.status(200).json(u);
-          }
-        });
-      }
+    const { data: response } = await axios.get('https://api.peopledatalabs.com/v5/person/enrich', {
+      params: searchParams,
     });
+
+    // res.status(200).send(response);
+    console.log(util.inspect(response));
+
+    const experience = response?.data.experience.map((exp) => ({
+      company: exp.company.name,
+      title: exp.title.name,
+      endDate: exp.end_date,
+    }));
+
+    const education = response?.data.education.map((ed) => ({
+      name: ed.school.name,
+      endDate: ed.end_date,
+    }));
+
+    const userData = {
+      firstName,
+      lastName,
+      zip,
+      email,
+      password,
+      age,
+      bio,
+      activityLevel,
+      preferences: {},
+      oneWayMatch: [],
+      twoWayMatch: [],
+      trackedWorkouts: [],
+      experience,
+      education,
+      linkedInID: response?.data.linkedin_id,
+      location: response?.data.location_metro,
+    };
+
+    console.log(userData);
+
+    const newUser = await User.create(userData);
+    res.status(200).json(newUser);
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -92,29 +119,79 @@ userRouter.post('/signin', async (req, res) => {
   }
 });
 
-// Update user info
-userRouter.put('/:email', async (req, res) => {
+userRouter.post('/potential-matches/', async (req, res) => {
   try {
-    const { email } = req.params;
+    const { preferences } = req.body;
+    console.log(preferences);
+    // TODO: what if preferences doesn't include field?
+    const filter = {
+      age: { $gte: 19, $lte: 23 },
+      activityLevel: { $gte: 2, $lte: 5 },
+    };
+
+    User.find(filter, (err, users) => {
+      if (err) {
+        res.status(400).json({ error: 'Error fetching users' });
+      } else {
+        res.json(users);
+      }
+    });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+userRouter.post('/swipe', async (req, res) => {
+  try {
+    const { swiperId, swipeeId } = req.body;
+    // Check for 2 way match
+    const swipee = await User.findById(swipeeId);
+    if (swipee.one_way_match.includes(swiperId)) {
+      // Remove swiper from swipee one_way_match
+      await User.findByIdAndUpdate(swipeeId, { $pull: { one_way_match: swiperId } });
+      // Add to both users two_way_match
+      await User.findByIdAndUpdate(swiperId, { $push: { two_way_match: swipeeId } });
+      await User.findByIdAndUpdate(swipeeId, { $push: { two_way_match: swiperId } });
+      res.status(200).json({ match: true });
+    } else {
+      // Not a two way match
+      // Add swipee to swipers one_way_match
+      await User.findByIdAndUpdate(swiperId, { $push: { one_way_match: swipeeId } });
+      res.status(200).json({ match: false });
+    }
+    return;
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// Update user info
+userRouter.put('/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
     const {
       firstName,
       lastName,
       zip,
-      phone,
-      wallet,
+      password,
+      age,
+      bio,
+      activityLevel,
       preferences,
       oneWayMatch,
       twoWayMatch,
       trackedWorkouts,
     } = req.body;
-    User.findOneAndUpdate(
-      { email },
+    User.findByIdAndUpdate(
+      userId,
       {
         firstName,
         lastName,
         zip,
-        phone,
-        wallet,
+        password,
+        age,
+        bio,
+        activityLevel,
         preferences,
         oneWayMatch,
         twoWayMatch,
@@ -135,10 +212,10 @@ userRouter.put('/:email', async (req, res) => {
 });
 
 // Delete user
-userRouter.delete('/:email', async (req, res) => {
+userRouter.delete('/:userId', async (req, res) => {
   try {
-    const { email } = req.params;
-    User.findOneAndDelete({ email }, (err, user) => {
+    const { userId } = req.params;
+    User.findByIdAndUpdate(userId, (err, user) => {
       if (err) {
         res.status(400).json({ error: 'Error deleting user' });
       } else {
