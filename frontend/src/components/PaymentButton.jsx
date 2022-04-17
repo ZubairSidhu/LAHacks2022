@@ -110,29 +110,33 @@ const PaymentButton = ({ onSuccess }) => {
     const overrides = {
       value: ethers.utils.parseEther("0.1"),
     };
-    const unsignedTx = await contract.populateTransaction.subscribe(
-      new Date().getFullYear() + 1,
-      overrides
-    );
-    signer.sendTransaction(unsignedTx).then(async (trans) => {
-      console.log(trans);
-      toast({
-        title: "Transaction sent.",
-        description: "Waiting for confirmation from the blockchain...",
-        status: "info",
-        duration: 2000,
-        isClosable: true,
+    try {
+      const unsignedTx = await contract.populateTransaction.subscribe(
+        new Date().getFullYear(),
+        overrides
+      );
+      signer.sendTransaction(unsignedTx).then(async (trans) => {
+        console.log(trans);
+        toast({
+          title: "Transaction sent.",
+          description: "Waiting for confirmation from the blockchain...",
+          status: "info",
+          duration: 2000,
+          isClosable: true,
+        });
+        await trans.wait(1);
+        toast({
+          title: "Transaction confirmed!",
+          description: "Redirecting you shortly...",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+        onSuccess();
       });
-      await trans.wait(1);
-      toast({
-        title: "Transaction confirmed!",
-        description: "Redirecting you shortly...",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
-      onSuccess();
-    });
+    } catch (e) {
+      console.log(JSON.stringify(e));
+    }
   };
   return (
     <Button colorScheme="teal" variant="solid" onClick={handleClick}>

@@ -6,6 +6,7 @@ import {
   FormErrorMessage,
   Input,
   Text,
+  Textarea,
   Button,
   Flex,
   Select,
@@ -166,7 +167,7 @@ const SignUpForm = () => {
             <Flex>
               <FormControl w="40%" isInvalid={errors?.bio}>
                 <FormLabel htmlFor="bio">Bio</FormLabel>
-                <Input
+                <Textarea
                   id="bio"
                   placeholder="About Me"
                   name="bio"

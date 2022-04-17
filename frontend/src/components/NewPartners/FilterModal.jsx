@@ -94,8 +94,15 @@ const FilterModal = ({ modalControl }) => {
   const { isOpen, onOpen, onClose } = modalControl;
 
   const onSubmit = async (data) => {
-    alert(JSON.stringify(data, null, 2));
-    setStorageValue("preferences", data);
+    const formattedData = {
+      ...data,
+      minAge: data.ageRange[0],
+      maxAge: data.ageRange[1],
+      minActivityLevel: data.activityRange[0],
+      maxActivityLevel: data.activityRange[1],
+    };
+    alert(JSON.stringify(formattedData, null, 2));
+    setStorageValue("preferences", formattedData);
   };
 
   return (
@@ -187,7 +194,8 @@ FilterButton.propTypes = {
 FormRangeSlider.propTypes = {
   name: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  control: PropTypes.func.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  control: PropTypes.object.isRequired,
   min: PropTypes.number.isRequired,
   max: PropTypes.number.isRequired,
 };
