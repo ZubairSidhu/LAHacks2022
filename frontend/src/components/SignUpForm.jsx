@@ -1,4 +1,5 @@
 import { React, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   FormControl,
@@ -12,10 +13,11 @@ import {
   Select,
   Checkbox,
 } from "@chakra-ui/react";
-import { ethers } from "ethers";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { AxiosBackend } from "../common/utils";
+import PaymentButton from "./PaymentButton";
 
 const SubscriptionButton = () => (
   <Button colorScheme="teal" variant="solid" type="submit">
@@ -27,15 +29,22 @@ const schema = yup
   .object({
     firstName: yup.string().required("Missing first name!"),
     lastName: yup.string().required("Missing last name!"),
-    zipCode: yup.string().required("Missing zip code!"),
-    email: yup.string().email().required("Missing email!"),
+    zipCode: yup
+      .string()
+      .test(
+        "len",
+        "Zipcode must be exactly 5 characters!",
+        (val) => val.length === 5
+      )
+      .required("Missing zip code!"),
+    email: yup.string().email("Invalid email!").required("Missing email!"),
     age: yup
       .number()
-      .min(1, "Invalid age: please enter a valid age (>0)")
+      .min(18, "Invalid age: must be at least 18 years old!")
       .typeError("Age must be a number!")
       .required("Missing age!"),
     activityLevel: yup.string().required("Missing activity level!"),
-    bio: yup.string(),
+    bio: yup.string().required("Missing a bio!"),
     password: yup
       .string()
       .required("Missing password!")
@@ -48,10 +57,12 @@ const schema = yup
   .required();
 
 const SignUpForm = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors },
+    getValues,
   } = useForm({
     resolver: yupResolver(schema),
     delayError: 750,
@@ -62,11 +73,32 @@ const SignUpForm = () => {
   const activityLevels = [1, 2, 3, 4, 5];
 
   const onSignUpSubmit = async (data) => {
-    console.log(data);
+    try {
+      const res = await AxiosBackend.post("/users/signup", {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        zip: data.zipCode,
+        email: data.email,
+        password: data.password,
+        age: data.age,
+        bio: data.bio,
+        activityLevel: data.activityLevel,
+        wallet: data.wallet,
+        transaction: data.transaction,
+      });
+
+      console.log(res);
+      navigate("/sign-in");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const onSignUpSubmitError = async (err) => {
-    console.log(err);
+  const paymentCallback = (transaction) => {
+    const data = getValues();
+    data.transaction = transaction.hash;
+    data.wallet = transaction.from;
+    onSignUpSubmit(data);
   };
 
   return (
@@ -78,17 +110,14 @@ const SignUpForm = () => {
       boxShadow="0px 4px 4px rgba(0, 0, 0, 0.25);"
       padding="40px 40px"
     >
-      <form
-        onSubmit={handleSubmit(onSignUpSubmit, onSignUpSubmitError)}
-        h="100%"
-      >
+      {/* <form onSubmit={handleSubmit(onSignUpSubmit)} h="100%"> */}
+      <form h="100%">
         <Flex
           flexDirection="column"
           justifyContent="space-between"
           gap="150px"
           h="100%"
         >
-          {/* {JSON.stringify(errors, null, 2)} */}
           <div>
             <Text fontSize="3xl">Sign Up</Text>
             <Flex justifyContent="space-between">
@@ -211,7 +240,8 @@ const SignUpForm = () => {
             </Flex>
           </div>
         </Flex>
-        <SubscriptionButton />
+        {/* <SubscriptionButton /> */}
+        <PaymentButton onSuccess={paymentCallback} />
       </form>
     </Box>
   );

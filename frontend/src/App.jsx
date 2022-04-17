@@ -8,6 +8,7 @@ import theme from "./theme";
 // Pages
 import Test from "./pages/TestPage/Test";
 import SignUp from "./pages/SignUp/SignUp";
+import SignIn from "./pages/SignIn/SignIn";
 import NewPartners from "./pages/NewPartners/NewPartners";
 import AwaitingMatches from "./pages/AwaitingMatches/AwaitingMatches";
 import ExistingMatches from "./pages/ExistingMatches/ExistingMatches";
@@ -26,10 +27,14 @@ function App() {
             <Routes>
               <Route path="/" element={<Test />} />
               <Route path="/sign-up" element={<SignUp />} />
+              <Route path="/sign-in" element={<SignIn />} />
               <Route path="/meet" element={<NewPartners />} />
               <Route path="/notifications" element={<AwaitingMatches />} />
               <Route path="/matches" element={<ExistingMatches />} />
-              <Route path="/testing" element={<PaymentButton />} />
+              <Route
+                path="/testing"
+                element={<PaymentButton onSuccess={console.log} />}
+              />
             </Routes>
           </Box>
         </Box>

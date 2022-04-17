@@ -23,11 +23,16 @@ mongoConnection.once('open', () => {
   console.log('MongoDB database connection established successfully');
 });
 
+const corsOrigin =
+  process.env.REACT_APP_HOST && process.env.REACT_APP_PORT
+    ? `${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}`
+    : 'http://localhost:3000';
+
 app.use(
   express.urlencoded({ extended: true }),
   express.json(),
   cors({
-    origin: `${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}`,
+    origin: '*',
     credentials: true,
   }),
 );

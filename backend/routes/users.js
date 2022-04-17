@@ -41,12 +41,25 @@ userRouter.get('/:email', async (req, res) => {
 // User sign up
 userRouter.post('/signup', async (req, res) => {
   try {
-    const { firstName, lastName, zip, email, password, age, bio, activityLevel } = req.body;
+    const {
+      firstName,
+      lastName,
+      zip,
+      email,
+      password,
+      age,
+      bio,
+      activityLevel,
+      wallet,
+      transaction,
+    } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       res.status(400).json('Email Already Exists');
       return;
     }
+
+    console.log(wallet, transaction);
 
     const searchParams = {
       api_key: process.env.PDL_KEY,
@@ -83,6 +96,7 @@ userRouter.post('/signup', async (req, res) => {
       age,
       bio,
       activityLevel,
+      wallet,
       preferences: {},
       oneWayMatch: [],
       twoWayMatch: [],

@@ -1,8 +1,8 @@
 import { React } from "react";
 import { Box, Flex } from "@chakra-ui/react";
-import SignUpForm from "../../components/SignUpForm";
+import SignInForm from "../../components/SignInForm";
 
-const SignUp = () => {
+const SignIn = () => {
   return (
     <Box minH="100vh" w="100%">
       <Flex
@@ -12,11 +12,11 @@ const SignUp = () => {
         justify="center"
       >
         <div>
-          <SignUpForm />
+          <SignInForm />
         </div>
       </Flex>
     </Box>
   );
 };
 
-export default SignUp;
+export default SignIn;

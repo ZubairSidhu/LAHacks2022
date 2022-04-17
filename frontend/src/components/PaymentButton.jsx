@@ -56,13 +56,14 @@ const PaymentButton = ({ onSuccess }) => {
 
   const handleClick = async () => {
     try {
-      window.ethereum.request({
+      await window.ethereum.request({
         method: "wallet_addEthereumChain",
         params: [
           {
             chainId: "0xA869",
-            rpcUrls: ["https://rpc.ankr.com/avalanche_fuji-c"],
-            chainName: "Avalanche FUJI C-Chain (ANKR RPC)",
+            // rpcUrls: ["https://rpc.ankr.com/avalanche_fuji-c"],
+            rpcUrls: ["https://api.avax-test.network/ext/bc/C/rpc"],
+            chainName: "Avalanche FUJI C-Chain",
             nativeCurrency: {
               name: "AVAX",
               symbol: "AVAX",
@@ -72,19 +73,11 @@ const PaymentButton = ({ onSuccess }) => {
           },
         ],
       });
-      window.ethereum.request({
+      await window.ethereum.request({
         method: "wallet_switchEthereumChain",
         params: [
           {
             chainId: "0xA869",
-            rpcUrls: ["https://rpc.ankr.com/avalanche_fuji-c"],
-            chainName: "Avalanche FUJI C-Chain (ANKR RPC)",
-            nativeCurrency: {
-              name: "AVAX",
-              symbol: "AVAX",
-              decimals: 18,
-            },
-            blockExplorerUrls: ["https://testnet.snowtrace.io/"],
           },
         ],
       });
@@ -99,6 +92,18 @@ const PaymentButton = ({ onSuccess }) => {
     const signer = provider.getSigner();
 
     const contract = new ethers.Contract(CONTRACT_ADDR, CONTRACT_ABI, provider);
+    console.log(await signer.getAddress());
+
+    const balance = ethers.utils.formatEther(await signer.getBalance());
+    if (balance < 0.1) {
+      return toast({
+        title: "Transaction failed",
+        description: "Reason: balance < 0.1",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
 
     // const tx = {
     //   to: "0x0000D44D16c1185C22d7Bc402600085d9b2efdD2",
@@ -109,33 +114,53 @@ const PaymentButton = ({ onSuccess }) => {
     // };
     const overrides = {
       value: ethers.utils.parseEther("0.1"),
+      gasLimit: ethers.utils.hexlify(100000),
     };
+    let unsignedTx;
     try {
-      const unsignedTx = await contract.populateTransaction.subscribe(
+      // Increment year because contract reverts if you resubscribe for same year
+      unsignedTx = await contract.populateTransaction.subscribe(
         new Date().getFullYear(),
         overrides
       );
-      signer.sendTransaction(unsignedTx).then(async (trans) => {
-        console.log(trans);
-        toast({
-          title: "Transaction sent.",
-          description: "Waiting for confirmation from the blockchain...",
-          status: "info",
-          duration: 2000,
-          isClosable: true,
-        });
-        await trans.wait(1);
-        toast({
-          title: "Transaction confirmed!",
-          description: "Redirecting you shortly...",
-          status: "success",
-          duration: 2000,
-          isClosable: true,
-        });
-        onSuccess();
+      const trans = await signer.sendTransaction(unsignedTx);
+      toast({
+        title: "Transaction sent.",
+        description: "Waiting for confirmation from the blockchain...",
+        status: "info",
+        duration: 2000,
+        isClosable: true,
       });
+      await trans.wait(1);
+      toast({
+        title: "Transaction confirmed!",
+        description: "Redirecting you shortly...",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+      console.log("trans", trans);
+      onSuccess(trans, await signer.getAddress());
     } catch (e) {
-      console.log(JSON.stringify(e));
+      console.log(e);
+      if (e.message === "Internal JSON-RPC error.") {
+        if (
+          e.data.message ===
+          "execution reverted: ALREADY SUBSCRIBED FOR THAT YEAR"
+        ) {
+          toast({
+            title: "Transaction failed",
+            description: "Reason: already subscribed",
+            status: "error",
+            duration: 2000,
+            isClosable: true,
+          });
+        } else {
+          console.log(e);
+        }
+      } else {
+        console.log(e);
+      }
     }
   };
   return (

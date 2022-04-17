@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React } from "react";
 import PropTypes from "prop-types";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -47,7 +47,13 @@ const FormRangeSlider = ({ name, title, control, min, max }) => (
       name={name}
       // eslint-disable-next-line no-unused-vars
       render={({ field: { onChange, value, ref } }) => (
-        <RangeSlider min={min} max={max} step={1} onChange={onChange}>
+        <RangeSlider
+          defaultValue={[value[0], value[1]]}
+          min={min}
+          max={max}
+          step={1}
+          onChange={onChange}
+        >
           <Flex flexDirection="row">
             <RangeSliderMark value={min} mt="16px" fontSize="sm">
               {min}
@@ -87,7 +93,7 @@ const FilterModal = ({ modalControl }) => {
     delayError: 750,
     defaultValues: {
       ageRange: [18, 65],
-      activityRange: [2, 3],
+      activityRange: [2, 4],
     },
   });
 
@@ -103,6 +109,7 @@ const FilterModal = ({ modalControl }) => {
     };
     alert(JSON.stringify(formattedData, null, 2));
     setStorageValue("preferences", formattedData);
+    onClose();
   };
 
   return (
