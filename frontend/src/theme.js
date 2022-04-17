@@ -5,6 +5,17 @@ const theme = extendTheme({
     heading: "Inter",
     body: "Inter",
   },
+  components: {
+    Button: {
+      variants: {
+        solidNoHover: (props) => ({
+          ...theme.components.Button.variants.solid(props),
+          _hover: {},
+          _active: {},
+        }),
+      },
+    },
+  },
 });
 
 export default theme;

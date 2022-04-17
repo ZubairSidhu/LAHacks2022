@@ -50,7 +50,6 @@ const UserCard = ({ userData }) => {
 };
 
 UserCard.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   userData: PropTypes.shape({
     firstName: PropTypes.string,
     lastName: PropTypes.string,
@@ -59,4 +58,5 @@ UserCard.propTypes = {
     zip: PropTypes.string,
   }).isRequired,
 };
+
 export default UserCard;

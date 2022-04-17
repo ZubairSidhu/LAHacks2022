@@ -1,8 +1,16 @@
 import { React } from "react";
-
-import UserCard from "../../components/UserCard";
+import {
+  Box,
+  Text,
+  Image,
+  Flex,
+  IconButton,
+  useDisclosure,
+} from "@chakra-ui/react";
+import { UserCard, FilterModal } from "../../components/NewPartners";
 
 const NewPartners = () => {
+  const modalControl = useDisclosure();
   const dummyUser = {
     firstName: "Dan",
     lastName: "Abramov",
@@ -20,10 +28,11 @@ const NewPartners = () => {
     zip: 90210,
   };
   return (
-    <div>
+    <Box w="100%" h="100%">
       New Partners Page
+      <FilterModal modalControl={modalControl} />
       <UserCard userData={dummyUser} />
-    </div>
+    </Box>
   );
 };
 
