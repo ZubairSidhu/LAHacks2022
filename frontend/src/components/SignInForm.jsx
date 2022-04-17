@@ -63,6 +63,7 @@ const SignInForm = () => {
         isClosable: true,
       });
     }
+    return null;
   };
 
   return (

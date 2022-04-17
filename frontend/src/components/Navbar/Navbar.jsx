@@ -1,13 +1,7 @@
 import { React, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 
-import {
-  Button,
-  Box,
-  Text,
-  Flex,
-  flexbox,
-} from "@chakra-ui/react";
+import { Box, Text, Flex, Avatar } from "@chakra-ui/react";
 
 const ProfileMenu = () => {
   return (
@@ -90,20 +84,6 @@ const Navbar = () => {
           Meet
         </Text>
       </NavLink>
-      <NavLink to="/notifications">
-        <Text
-          fontSize="24px"
-          lineHeight="58px"
-          marginLeft="35px"
-          marginRight="35px"
-          _hover={{
-            transition: "0.2s ease",
-            textShadow: "-3px 4px rgba(255,255,255,0.3)",
-          }}
-        >
-          Notifications
-        </Text>
-      </NavLink>
       <NavLink to="/matches">
         <Text
           fontSize="24px"
@@ -132,17 +112,15 @@ const Navbar = () => {
           Workouts
         </Text>
       </NavLink>
-      <div
+      <Avatar
         style={{
           height: "36px",
           width: "36px",
-          backgroundColor: "white",
           position: "absolute",
           right: "18px",
           top: "9px",
           borderRadius: "50%",
           cursor: "pointer",
-          // TODO: Hover style in css?
         }}
         aria-hidden="true"
         onClick={() => setOpen(!open)}

@@ -1,5 +1,5 @@
 import { React } from "react";
-import { Box, Text, Image, Flex, IconButton, useToast } from "@chakra-ui/react";
+import { Box, Text, Flex, IconButton, Avatar } from "@chakra-ui/react";
 import { CloseIcon, CheckIcon } from "@chakra-ui/icons";
 import PropTypes from "prop-types";
 
@@ -27,8 +27,7 @@ function sortExp(a, b) {
   return 0;
 }
 
-const UserCard = ({ userData }) => {
-  const toast = useToast();
+const UserCard = ({ userData, nextUser, triggerToast }) => {
   const filterData = {
     ...userData,
     experience: userData.experience.sort(sortExp).slice(0, 4),
@@ -42,16 +41,7 @@ const UserCard = ({ userData }) => {
       swiperId,
       swipeeId: userData.id,
     });
-
-    if (res?.data.match) {
-      toast({
-        title: "Match!",
-        description: `You just matched with ${userData.firstName} ${userData.lastName}`,
-        status: "sucess",
-        duration: 2000,
-        isClosable: true,
-      });
-    }
+    nextUser();
   };
 
   return (
@@ -63,33 +53,42 @@ const UserCard = ({ userData }) => {
       boxShadow="0px 4px 4px rgba(0, 0, 0, 0.25);"
       padding="40px 40px"
     >
-      <Flex flexDirection="column" justifyContent="space-between" h="100%">
+      <Flex
+        flexDirection="column"
+        minH="500px"
+        justify="space-between"
+        alignItems="stretch"
+      >
         <Flex alignItems="center" justify="space-between">
           <Text fontSize="3xl">{`${userData.firstName} ${userData.lastName}`}</Text>
-          <Image
-            src="https://bit.ly/dan-abramov"
+          <Avatar
+            // src="https://bit.ly/dan-abramov"
+            name={`${userData.firstName} ${userData.lastName}`}
             alt={`${userData.firstName} ${userData.lastName}`}
-            borderRadius="full"
-            boxSize="128px"
+            size="2xl"
           />
         </Flex>
         <Flex
-          flexGrow="2"
           flexDirection="column"
+          flexGrow="1"
           gap="15px"
           w="330px"
           mb="40px"
         >
           <Text fontSize="xl">Experience</Text>
-          {filterData.experience.map((exp) => (
-            <Box key={exp.company}>
-              <Text>{exp.title}</Text>
-              <Text>{`@ ${exp.company}`}</Text>
-            </Box>
-          ))}
+          {filterData.experience.length !== 0 ? (
+            filterData.experience.map((exp) => (
+              <Box key={exp.company}>
+                <Text>{exp.title}</Text>
+                <Text>{`@ ${exp.company}`}</Text>
+              </Box>
+            ))
+          ) : (
+            <Box>No experience found :(</Box>
+          )}
         </Flex>
         <Flex direction="row" justifyContent="space-between" p="0 20px">
-          <RejectButton click={() => null} />
+          <RejectButton click={nextUser} />
           <AcceptButton click={swipeLeft} />
         </Flex>
       </Flex>
@@ -106,6 +105,8 @@ UserCard.propTypes = {
     experience: PropTypes.string,
     zip: PropTypes.string,
   }).isRequired,
+  nextUser: PropTypes.func.isRequired,
+  triggerToast: PropTypes.func.isRequired,
 };
 
 AcceptButton.propTypes = {

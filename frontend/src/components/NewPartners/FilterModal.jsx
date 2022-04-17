@@ -107,7 +107,6 @@ const FilterModal = ({ modalControl }) => {
       minActivityLevel: data.activityRange[0],
       maxActivityLevel: data.activityRange[1],
     };
-    alert(JSON.stringify(formattedData, null, 2));
     setStorageValue("preferences", formattedData);
     onClose();
   };
@@ -169,17 +168,6 @@ const FilterModal = ({ modalControl }) => {
                       />
                     </FormControl>
                   </Flex>
-                  <Box w="50%" pr="20px">
-                    <FormControl>
-                      <FormLabel htmlFor="school">School</FormLabel>
-                      <Input
-                        id="school"
-                        placeholder="e.g. UCLA"
-                        name="school"
-                        {...register("school")}
-                      />
-                    </FormControl>
-                  </Box>
                 </Flex>
 
                 <Button type="submit" size="md" colorScheme="teal" maxW="140px">

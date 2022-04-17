@@ -25,7 +25,7 @@ function App() {
         <Box className="page-container">
           <Box className="content-wrap">
             <Routes>
-              <Route path="/" element={<Test />} />
+              <Route path="/" element={<NewPartners />} />
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/meet" element={<NewPartners />} />

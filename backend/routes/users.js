@@ -8,6 +8,22 @@ const User = require('../models/user.model');
 const userRouter = express();
 userRouter.use(express.json());
 
+// Get user by userId
+userRouter.get('/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    User.findById(userId, (err, user) => {
+      if (err) {
+        res.status(400).json({ error: 'Error fetching users' });
+      } else {
+        res.json(user); // Returns null if not found
+      }
+    });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 // Get all users
 userRouter.get('/', async (req, res) => {
   try {
@@ -16,22 +32,6 @@ userRouter.get('/', async (req, res) => {
         res.status(400).json({ error: 'Error fetching users' });
       } else {
         res.json(users);
-      }
-    });
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-// Get user by email
-userRouter.get('/:email', async (req, res) => {
-  try {
-    const { email } = req.params;
-    User.findOne({ email }, (err, user) => {
-      if (err) {
-        res.status(400).json({ error: 'Error fetching users' });
-      } else {
-        res.json(user); // Returns null if not found
       }
     });
   } catch (error) {
@@ -154,43 +154,46 @@ userRouter.post('/potential-matches/', async (req, res) => {
       };
     }
 
-    // const users = await Users.find(filter);
+    const users = await User.find(filter);
 
-    // console.log(filter);
-    User.find(filter, (err, users) => {
-      if (err) {
-        res.status(400).json({ error: 'Error fetching users' });
-      } else {
-        // console.log(users);
-        const titleResults =
-          preferences.title == null
-            ? users
-            : new Fuse(users, {
-                includeMatches: true,
-                isCaseSensitive: false,
-                keys: ['experience.title'],
-              })
-                .search(preferences.title)
-                .map((result) => result.item);
-        const companyResults =
-          preferences.company == null
-            ? users
-            : new Fuse(users, {
-                isCaseSensitive: false,
-                includeMatches: true,
-                keys: ['experience.company'],
-              })
-                .search(preferences.company)
-                .map((result) => result.item);
-        res.json(
-          preferences.title === null && preferences.company === null
-            ? users
-            : (preferences.title == null ? users : titleResults).filter((user) =>
-                (preferences.company == null ? users : companyResults).includes(user),
-              ),
-        );
-      }
-    });
+    // If no fuzzy filters return matching users
+    if (preferences.title === '' && preferences.company === '') {
+      res.status(200).send(users);
+      return;
+    }
+
+    const titleResults =
+      preferences.title == null
+        ? users
+        : new Fuse(users, {
+            includeMatches: true,
+            isCaseSensitive: false,
+            keys: ['experience.title'],
+          })
+            .search(preferences.title)
+            .map((result) => result.item);
+
+    const companyResults =
+      preferences.company == null
+        ? users
+        : new Fuse(users, {
+            isCaseSensitive: false,
+            includeMatches: true,
+            keys: ['experience.company'],
+          })
+            .search(preferences.company)
+            .map((result) => result.item);
+
+    let fuzzyUsers;
+    if (preferences.title && preferences.company) {
+      fuzzyUsers = companyResults.filter((value) => titleResults.includes(value));
+    } else if (preferences.title) {
+      fuzzyUsers = titleResults;
+    } else {
+      fuzzyUsers = companyResults;
+    }
+
+    res.status(200).send(fuzzyUsers);
   } catch (err) {
     res.status(500).send(err.message);
   }

@@ -32,8 +32,12 @@ function setUserId(userId) {
 }
 
 function getUserId() {
-  const { id: userId } = getStorageValue("currUserId", null);
-  return userId;
+  try {
+    const { id: userId } = getStorageValue("currUserId", null);
+    return userId;
+  } catch (err) {
+    return null;
+  }
 }
 
 const useLocalStorage = (key, defaultValue) => {
