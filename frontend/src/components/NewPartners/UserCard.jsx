@@ -1,6 +1,6 @@
 import { React } from "react";
 import { Box, Text, Flex, IconButton, Avatar } from "@chakra-ui/react";
-import { CloseIcon, CheckIcon } from "@chakra-ui/icons";
+import { CloseIcon, CheckIcon, StarIcon } from "@chakra-ui/icons";
 import PropTypes from "prop-types";
 
 import { AxiosBackend, getStorageValue } from "../../common/utils";
@@ -27,7 +27,7 @@ function sortExp(a, b) {
   return 0;
 }
 
-const UserCard = ({ userData, nextUser, triggerToast }) => {
+const UserCard = ({ userData, nextUser }) => {
   const filterData = {
     ...userData,
     experience: userData.experience.sort(sortExp).slice(0, 4),
@@ -50,7 +50,7 @@ const UserCard = ({ userData, nextUser, triggerToast }) => {
       minH="615px"
       borderRadius="lg"
       bgColor="purple.100"
-      boxShadow="0px 4px 4px rgba(0, 0, 0, 0.25);"
+      boxShadow={nextUser && "0px 4px 4px rgba(0, 0, 0, 0.25);"}
       padding="40px 40px"
     >
       <Flex
@@ -86,14 +86,26 @@ const UserCard = ({ userData, nextUser, triggerToast }) => {
           ) : (
             <Box>No experience found :(</Box>
           )}
+          {userData.location && (
+            <Flex alignItems="baseline">
+              <StarIcon mr="10px" />
+              <Text fontSize="lg">{`${userData.location}`}</Text>
+            </Flex>
+          )}
         </Flex>
-        <Flex direction="row" justifyContent="space-between" p="0 20px">
-          <RejectButton click={nextUser} />
-          <AcceptButton click={swipeLeft} />
-        </Flex>
+        {nextUser && (
+          <Flex direction="row" justifyContent="space-between" p="0 20px">
+            <RejectButton click={nextUser} />
+            <AcceptButton click={swipeLeft} />
+          </Flex>
+        )}
       </Flex>
     </Box>
   );
+};
+
+UserCard.defaultProps = {
+  nextUser: null,
 };
 
 UserCard.propTypes = {
@@ -104,9 +116,9 @@ UserCard.propTypes = {
     profilePicture: PropTypes.string,
     experience: PropTypes.string,
     zip: PropTypes.string,
+    location: PropTypes.string,
   }).isRequired,
-  nextUser: PropTypes.func.isRequired,
-  triggerToast: PropTypes.func.isRequired,
+  nextUser: PropTypes.func,
 };
 
 AcceptButton.propTypes = {

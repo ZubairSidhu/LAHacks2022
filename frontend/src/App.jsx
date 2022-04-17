@@ -13,6 +13,7 @@ import NewPartners from "./pages/NewPartners/NewPartners";
 import AwaitingMatches from "./pages/AwaitingMatches/AwaitingMatches";
 import ExistingMatches from "./pages/ExistingMatches/ExistingMatches";
 import PaymentButton from "./components/PaymentButton";
+import Workouts from "./pages/Workouts/Workouts";
 
 // Import other components
 import Navbar from "./components/Navbar/Navbar";
@@ -31,6 +32,7 @@ function App() {
               <Route path="/meet" element={<NewPartners />} />
               <Route path="/notifications" element={<AwaitingMatches />} />
               <Route path="/matches" element={<ExistingMatches />} />
+              <Route path="/workouts" element={<Workouts />} />
               <Route
                 path="/testing"
                 element={<PaymentButton onSuccess={console.log} />}

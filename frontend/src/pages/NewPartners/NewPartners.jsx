@@ -79,7 +79,7 @@ const NewPartners = () => {
         minH="100vh"
         alignItems="center"
         justify="center"
-        mt="50px"
+        // mt="10px"
       >
         <Flex flexDir="column" gap="30px" alignItems="center">
           <FilterModal modalControl={modalControl} />

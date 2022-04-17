@@ -13,6 +13,7 @@ import {
   Select,
   Checkbox,
   useToast,
+  Link,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -241,7 +242,7 @@ const SignUpForm = () => {
               </FormErrorMessage>
             </FormControl>
           </Flex>
-          <Flex>
+          <Flex justifyContent="space-between">
             <Checkbox
               colorScheme="green"
               borderColor="grey"
@@ -249,6 +250,14 @@ const SignUpForm = () => {
             >
               Show Password
             </Checkbox>
+            <Link
+              href="/sign-in"
+              fontWeight="bold"
+              textDecoration="underline"
+              _hover={{ textDecoration: "none" }}
+            >
+              Already have an account? Sign in.
+            </Link>
           </Flex>
         </Flex>
         {/* <SubscriptionButton /> */}

@@ -68,12 +68,12 @@ const SignInForm = () => {
 
   return (
     <Box
-      w="900px"
-      h="600px"
+      w="500px"
+      h="450px"
       borderRadius="lg"
       bgColor="purple.100"
       boxShadow="0px 4px 4px rgba(0, 0, 0, 0.25);"
-      padding="40px 40px"
+      padding="40px 0px"
     >
       <form onSubmit={handleSubmit(onSignInSubmit)} h="100%">
         <Flex
@@ -84,7 +84,7 @@ const SignInForm = () => {
           h="100%"
         >
           <Text fontSize="3xl">Sign In</Text>
-          <FormControl w="40%" isInvalid={errors?.email}>
+          <FormControl w="70%" isInvalid={errors?.email}>
             <FormLabel htmlFor="email">Email</FormLabel>
             <Input
               id="email"
@@ -95,7 +95,7 @@ const SignInForm = () => {
             />
             <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
           </FormControl>
-          <FormControl w="40%" isInvalid={errors?.password}>
+          <FormControl w="70%" isInvalid={errors?.password}>
             <FormLabel htmlFor="password">Password</FormLabel>
             <Input
               id="password"
@@ -116,7 +116,7 @@ const SignInForm = () => {
               Show Password
             </Checkbox>
           </Flex>
-          <Flex justifyContent="space-between" gap="100px">
+          <Flex justifyContent="space-between" alignItems="center" gap="100px">
             <SignInButton />
             <Link
               href="/sign-up"

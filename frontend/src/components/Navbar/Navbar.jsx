@@ -73,7 +73,7 @@ const Navbar = () => {
       <NavLink to="/meet">
         <Text
           fontSize="24px"
-          lineHeight="58px"
+          lineHeight="50px"
           marginLeft="20px"
           marginRight="35px"
           _hover={{
@@ -87,7 +87,7 @@ const Navbar = () => {
       <NavLink to="/matches">
         <Text
           fontSize="24px"
-          lineHeight="58px"
+          lineHeight="50px"
           marginLeft="35px"
           marginRight="35px"
           _hover={{
@@ -101,7 +101,7 @@ const Navbar = () => {
       <NavLink to="/workouts">
         <Text
           fontSize="24px"
-          lineHeight="58px"
+          lineHeight="50px"
           marginLeft="35px"
           marginRight="35px"
           _hover={{

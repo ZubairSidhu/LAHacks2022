@@ -1,4 +1,5 @@
 import { React, useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -6,27 +7,68 @@ import {
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
-  TableCaption,
   TableContainer,
   Button,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Flex,
 } from "@chakra-ui/react";
+import UserCard from "./NewPartners/UserCard";
 import { AxiosBackend, getUserId } from "../common/utils";
+
+const UserModal = ({ modalControl, userData }) => {
+  return (
+    <Modal isOpen={modalControl.isOpen} onClose={modalControl.onClose}>
+      <ModalOverlay />
+      <ModalContent bgColor="purple.100" maxW="fit-content" maxH="fit-content">
+        <ModalCloseButton />
+        <UserCard userData={userData} />
+        <Flex justifyContent="center" gap="20px" paddingBottom="30px">
+          <Button colorScheme="purple" variant="solid">
+            Create SMS Chat
+          </Button>
+          <Button colorScheme="purple" variant="solid">
+            Submit Workout
+          </Button>
+        </Flex>
+      </ModalContent>
+    </Modal>
+  );
+};
 
 const MatchesTable = () => {
   const [matches, setMatches] = useState([]);
+  const [currUser, setCurrUser] = useState({});
   const navigate = useNavigate();
+  const modalControl = useDisclosure();
+
+  const getMatches = async (userId) => {
+    const res = await AxiosBackend.get(`users/${userId}`);
+    console.log("getMatches");
+    console.log(res);
+
+    const matchData = await Promise.all(
+      res.data.two_way_match.map(async (matchId) => {
+        const user = await AxiosBackend.get(`users/${matchId}`);
+        return user.data;
+      })
+    );
+
+    setMatches(matchData);
+  };
 
   useEffect(async () => {
     try {
       const userId = getUserId();
-      const res = await AxiosBackend.get(`users/${userId}`);
-      const twoWayMatches = res.data.two_way_match;
-      console.log("Matches response", twoWayMatches);
-      // setMatches(twoWayMatches);
+      await getMatches(userId);
     } catch (err) {
       console.log(err.response);
     }
@@ -35,24 +77,26 @@ const MatchesTable = () => {
   const matchRows = () => {
     return (
       <Tbody>
-        {matches.map(async (matchId, index) => {
-          const res = await AxiosBackend.get(`users/${matchId}`);
-          console.log(res.data);
+        {matches.map((match, index) => {
           return (
-            // eslint-disable-next-line react/no-array-index-key
-            <Tr key={index}>
-              {/* <Td>{`${res.data.firstName} ${res.data.lastName}`}</Td> */}
-              <Td>Hello there</Td>
-              <Td>
-                <Button
-                  colorScheme="teal"
-                  variant="solid"
-                  onClick={() => navigate("/")}
-                >
-                  View Profile
-                </Button>
-              </Td>
-            </Tr>
+            match && (
+              // eslint-disable-next-line react/no-array-index-key
+              <Tr key={index}>
+                <Td>{`${match?.firstName} ${match?.lastName}`}</Td>
+                <Td>
+                  <Button
+                    colorScheme="teal"
+                    variant="solid"
+                    onClick={() => {
+                      setCurrUser(match);
+                      modalControl.onOpen();
+                    }}
+                  >
+                    View Profile
+                  </Button>
+                </Td>
+              </Tr>
+            )
           );
         })}
       </Tbody>
@@ -69,7 +113,6 @@ const MatchesTable = () => {
     >
       <TableContainer>
         <Table variant="simple">
-          <TableCaption>Imperial to metric conversion factors</TableCaption>
           <Thead>
             <Tr>
               <Th>NAME</Th>
@@ -77,16 +120,18 @@ const MatchesTable = () => {
             </Tr>
           </Thead>
           {matchRows()}
-          <Tfoot>
-            <Tr>
-              <Th>To convert</Th>
-              <Th>into</Th>
-            </Tr>
-          </Tfoot>
+          <UserModal modalControl={modalControl} userData={currUser} />
         </Table>
       </TableContainer>
     </Box>
   );
+};
+
+UserModal.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  modalControl: PropTypes.object.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  userData: PropTypes.object.isRequired,
 };
 
 export default MatchesTable;

@@ -78,14 +78,14 @@ userRouter.post('/signup', async (req, res) => {
     console.log(util.inspect(response));
 
     const experience = response?.data.experience.map((exp) => ({
-      company: exp.company.name,
-      title: exp.title.name,
-      endDate: exp.end_date,
+      company: exp?.company?.name,
+      title: exp?.title?.name,
+      endDate: exp?.end_date,
     }));
 
     const education = response?.data.education.map((ed) => ({
-      name: ed.school.name,
-      endDate: ed.end_date,
+      name: ed?.school?.name,
+      endDate: ed?.end_date,
     }));
 
     const userData = {
