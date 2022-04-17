@@ -249,7 +249,7 @@ userRouter.put('/:userId', async (req, res) => {
 userRouter.delete('/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    User.findByIdAndUpdate(userId, (err, user) => {
+    User.deleteOne({ _id: userId }, (err, user) => {
       if (err) {
         res.status(400).json({ error: 'Error deleting user' });
       } else {
