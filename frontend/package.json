@@ -27,7 +27,7 @@
     "eject": "react-scripts eject",
     "lint": "eslint '**/*.{js,jsx}'",
     "format": "prettier --write \"**/*.+(js|jsx|css)\"",
-    "prepare": "husky install"
+    "prepare": "cd .. && husky install"
   },
   "lint-staged": {
     "*.{js,jsx}": "yarn run eslint"
