@@ -36,12 +36,38 @@ userRouter.get('/:email', async (req, res) => {
 });
 
 // User sign up
+// TODO: Make sure there's no duplicate emails
 userRouter.post('/signup', async (req, res) => {
   try {
-    const { firstName, lastName, zip, email, password, phone, wallet } = req.body;
-    const obj = { firstName, lastName, zip, email, password, phone, wallet };
-    res.status(200).send({
-      obj,
+    const { firstName, lastName, zip, email, password, wallet } = req.body;
+
+    User.findOne({ email }, (err, user) => {
+      if (err) {
+        res.status(400).json({ error: 'Error fetching users' });
+      } else if (user) {
+        res.status(400).json('Email Already Exists');
+      } else {
+        const obj = {
+          firstName,
+          lastName,
+          zip,
+          email,
+          password,
+          wallet,
+          preferences: [],
+          oneWayMatch: [],
+          twoWayMatch: [],
+          trackedWorkouts: [],
+        };
+
+        User.create(obj, (e, u) => {
+          if (e) {
+            res.status(400).json({ e: 'Error creating user' });
+          } else {
+            res.status(200).json(u);
+          }
+        });
+      }
     });
   } catch (err) {
     res.status(500).send(err.message);
